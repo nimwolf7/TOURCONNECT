@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Service | Tour Connect{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <!-- Flash messages -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <!-- Card Header with Gradient -->
+                <div class="card-header text-white py-4" style="background: linear-gradient(135deg, #0E4A52 0%, #13616c 100%);">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-edit fa-2x me-3"></i>
+                        <div>
+                            <h3 class="mb-0 fw-bold">Edit Service</h3>
+                            <small class="text-white-50">Update service information</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4" style="background-color: #F5F1E6;">
+                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-secondary">
+                                <i class="fas fa-image me-2"></i>Service Image
+                            </label>
+                            {% if service.image %}
+                                <div class="mb-2">
+                                    <img src="{{ asset('images/services/' ~ service.image) }}" 
+                                         alt="{{ service.title }}" 
+                                         class="img-thumbnail" 
+                                         style="max-height: 150px;">
+                                    <p class="text-muted small mt-1">Current image</p>
+                                </div>
+                            {% endif %}
+                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.imageFile) }}
+                            <small class="text-muted">Upload a new image to replace the current one (JPG or PNG, max 5MB)</small>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Service Title'}}) }}
+                                {{ form_label(form.title, 'Service Title', {'label_attr': {'class': ''}}) }}
+                            </div>
+                            {{ form_errors(form.title) }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-secondary">
+                                <i class="fas fa-align-left me-2"></i>Description
+                            </label>
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Enter service description...'}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form_widget(form.price, {'attr': {'class': 'form-control', 'placeholder': 'Price'}}) }}
+                                {{ form_label(form.price, '₱ Price', {'label_attr': {'class': ''}}) }}
+                            </div>
+                            {{ form_errors(form.price) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form_widget(form.stock, {'attr': {'class': 'form-control', 'placeholder': 'Stock'}}) }}
+                                {{ form_label(form.stock, 'Stock Quantity', {'label_attr': {'class': ''}}) }}
+                            </div>
+                            {{ form_errors(form.stock) }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-secondary">
+                                <i class="fas fa-tag me-2"></i>Category
+                            </label>
+                            {{ form_widget(form.category, {'attr': {'class': 'form-select form-select-lg'}}) }}
+                            {{ form_errors(form.category) }}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                        <!-- Delete Button on Left -->
+                        <button type="button" class="btn btn-tour-danger px-4 py-2" 
+                                onclick="if(confirm('⚠️ Are you sure you want to delete this service?')) { document.getElementById('deleteForm').submit(); }">
+                            <i class="fas fa-trash me-2"></i>Delete
+                        </button>
+
+                        <!-- Update/Cancel on Right -->
+                        <div class="d-flex gap-3">
+                            <a href="{{ path('app_service_index') }}" class="btn btn-tour-outline px-5 py-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-tour px-5 py-2">
+                                <i class="fas fa-save me-2"></i>Update Service
+                            </button>
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <!-- Hidden Delete Form -->
+            <form id="deleteForm" method="post" action="{{ path('app_service_delete', {'id': service.id}) }}" style="display: none;">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ service.id) }}">
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Tour Connect Buttons */
+.btn-tour {
+    background-color: #0E4A52;
+    color: white;
+    border: none;
+    font-weight: 500;
+}
+.btn-tour:hover { background-color: #13616c; }
+
+.btn-tour-outline {
+    background-color: transparent;
+    color: #0E4A52;
+    border: 2px solid #0E4A52;
+    font-weight: 500;
+}
+.btn-tour-outline:hover { background-color: #0E4A52; color: white; }
+
+.btn-tour-danger {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    font-weight: 500;
+}
+.btn-tour-danger:hover { background-color: #b91c1c; }
+</style>
+{% endblock %}

@@ -1,9 +1,48 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <!-- Main Content -->
-    <div style="padding: 40px; text-align: center; background-color: #f9f9f9; min-height: 80vh;">
-        <h2 style="color:#1b3a4b;">Tour Connect Dashboard</h2>
-        <p style="color:#555;">Welcome to your travel booking journey</p>
+    <style>
+        /* Hide top navbar for home page */
+        .top-navbar {
+            display: none !important;
+        }
+
+        /* Override the content area styles for home page */
+        .content-area {
+            padding: 0 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('{{ asset('images/ph.jpg') }}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-color: transparent !important;
+        }
+
+        .home-content {
+            color: white;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .home-content h2 {
+            font-size: 4rem;
+            font-weight: 700;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .home-content p {
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+
+    <div class="home-content">
+        <h2>Tour Connect</h2>
+        <p>Welcome to your travel booking journey</p>
     </div>
 {% endblock %}

@@ -1,0 +1,28 @@
+{% set isEdit = button_label is defined and button_label == 'Update' %}
+{{ form_start(form, {'attr': {'class': 'booking-form p-4 rounded-4 shadow-sm', 'style': 'background: #F5F1E6'}}) }}
+    <h4 class="mb-4 fw-bold text-center" style="color: #0E4A52;">
+        {{ isEdit ? '✏️ Update Booking' : '📝 New Booking' }}
+    </h4>
+
+    <div class="row g-3">
+        {% for field in form %}
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
+                    {{ form_widget(field, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
+                    {{ form_errors(field) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% set buttonColor = isEdit ? '#EAB308' : '#0E4A52' %}
+    {% set buttonText = isEdit ? 'Update Booking' : 'Save Booking' %}
+
+    <div class="text-center mt-4">
+        <button class="btn px-4 py-2 text-white rounded-3 fw-semibold" 
+                style="background-color: {{ buttonColor }}; transition: 0.3s;">
+            {{ buttonText }}
+        </button>
+    </div>
+{{ form_end(form) }}

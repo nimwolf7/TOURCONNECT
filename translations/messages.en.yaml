@@ -1,0 +1,13 @@
+# English translations
+'Invalid credentials.': 'Invalid credentials.'
+'Username could not be found.': 'Username could not be found.'
+'The presented password is invalid.': 'The presented password is invalid.'
+'Account locked.': 'Account locked.'
+'Too many failed login attempts, please try again later.': 'Too many failed login attempts, please try again later.'
+'Invalid CSRF token.': 'Invalid CSRF token.'
+'Authentication required.': 'Authentication required.'
+'Access denied.': 'Access denied.'
+'Session expired.': 'Session expired.'
+'Please sign in.': 'Please sign in.'
+'Logout successful.': 'Logout successful.'
+'Login successful.': 'Login successful.'

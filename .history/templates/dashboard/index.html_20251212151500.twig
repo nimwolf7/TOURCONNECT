@@ -1,0 +1,278 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2 class="fw-bold text-dark mb-4">Dashboard Overview</h2>
+
+    <!-- Summary Metrics -->
+    <div class="row g-3 justify-content-center">
+        <!-- Total Users -->
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
+                <small class="fw-semibold text-secondary">Total Users</small>
+                <h5 class="fw-bold text-primary mb-1">{{ totalUsers|default(0) }}</h5>
+                <canvas id="usersSparkline" height="40"></canvas>
+            </div>
+        </div>
+
+        <!-- Total Services -->
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
+                <small class="fw-semibold text-secondary">Total Services</small>
+                <h5 class="fw-bold text-primary mb-1">{{ totalServices|default(0) }}</h5>
+                <canvas id="servicesSparkline" height="40"></canvas>
+            </div>
+        </div>
+
+        <!-- Total Bookings -->
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
+                <small class="fw-semibold text-secondary">Total Bookings</small>
+                <h5 class="fw-bold text-primary mb-1">{{ totalBookings|default(0) }}</h5>
+                <canvas id="bookingsSparkline" height="40"></canvas>
+            </div>
+        </div>
+
+        <!-- Total Inventory -->
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
+                <small class="fw-semibold text-secondary">Total Inventory</small>
+                <h5 class="fw-bold text-primary mb-1">{{ totalInventory|default(0) }}</h5>
+                <canvas id="inventorySparkline" height="40"></canvas>
+            </div>
+        </div>
+
+        <!-- Total Revenue -->
+        <div class="col-md-6 col-lg-3 col-12">
+            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
+                <small class="fw-semibold text-secondary">Total Revenue</small>
+                <h5 class="fw-bold text-success mb-1">
+                    ₱{{ totalRevenue|default(0)|number_format(2, '.', ',') }}
+                </h5>
+                <canvas id="revenueSparkline" height="40"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Statistics -->
+    <div class="row g-2 mt-2">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0 py-2 px-1 dashboard-card">
+                <small class="text-warning mb-0"><i class="fas fa-clock"></i> Pending</small>
+                <h6 class="fw-bold text-warning mb-0">{{ pendingBookings|default(0) }}</h6>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0 py-2 px-1 dashboard-card">
+                <small class="text-success mb-0"><i class="fas fa-check-circle"></i> Confirmed</small>
+                <h6 class="fw-bold text-success mb-0">{{ confirmedBookings|default(0) }}</h6>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0 py-2 px-1 dashboard-card">
+                <small class="text-danger mb-0"><i class="fas fa-times-circle"></i> Cancelled</small>
+                <h6 class="fw-bold text-danger mb-0">{{ cancelledBookings|default(0) }}</h6>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Top Services -->
+    <div class="row g-4 mt-3">
+        <!-- Recent Bookings -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 dashboard-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Recent Bookings</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recentBookings %}
+                                <tr>
+                                    <td class="fw-bold">₱{{ booking.totalAmount|number_format(2) }}</td>
+                                    <td>{{ booking.bookingDate|date('M d, Y') }}</td>
+                                    <td>
+                                        {% if booking.status|lower == 'confirmed' %}
+                                            <span class="badge bg-success">{{ booking.status }}</span>
+                                        {% elseif booking.status|lower == 'pending' %}
+                                            <span class="badge bg-warning">{{ booking.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ booking.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No bookings yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payments -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 dashboard-card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Recent Payments</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recentPayments %}
+                                <tr>
+                                    <td class="fw-bold">₱{{ payment.amount|number_format(2) }}</td>
+                                    <td>{{ payment.paymentDate|date('M d, Y') }}</td>
+                                    <td>
+                                        {% if payment.paymentStatus == 'Confirmed' %}
+                                            <span class="badge bg-success">{{ payment.paymentStatus }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">{{ payment.paymentStatus }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No payments yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Services & Recent Activity -->
+    <div class="row g-4 mt-3 mb-5">
+        <!-- Top Services -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 dashboard-card">
+                <div class="card-header" style="background: linear-gradient(135deg, #0E4A52, #13616C); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Top Services</h5>
+                </div>
+                <div class="card-body">
+                    {% if topServices|length > 0 %}
+                        {% for service in topServices %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <div>
+                                <strong>{{ service.title|slice(0, 35) }}</strong>
+                                <br>
+                                <small class="text-muted">₱{{ service.price|number_format(2) }}</small>
+                            </div>
+                            <span class="badge bg-success">{{ service.stock }} available</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-muted">No services available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 dashboard-card">
+                <div class="card-header" style="background: linear-gradient(135deg, #0E4A52, #13616C); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+                    {% if recentActivities|length > 0 %}
+                        {% for activity in recentActivities %}
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-circle text-primary" style="font-size: 8px;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong>{{ activity.user.username }}</strong>
+                                <span class="text-muted">{{ activity.action }}</span>
+                                <br>
+                                <small class="text-muted">{{ activity.timestamp|date('M d, Y H:i') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-muted">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js for Sparklines -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function createSparkline(ctx, data, color) {
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map((_, i) => i+1),
+            datasets: [{
+                data: data,
+                borderColor: color,
+                borderWidth: 2,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+}
+
+// Sparkline initialization
+createSparkline(document.getElementById('usersSparkline'), {{ usersSparkline|default([])|json_encode|raw }}, 'rgba(54,162,235,1)');
+createSparkline(document.getElementById('servicesSparkline'), {{ servicesSparkline|default([])|json_encode|raw }}, 'rgba(75,192,192,1)');
+createSparkline(document.getElementById('bookingsSparkline'), {{ bookingsSparkline|default([])|json_encode|raw }}, 'rgba(255,159,64,1)');
+createSparkline(document.getElementById('inventorySparkline'), {{ inventorySparkline|default([])|json_encode|raw }}, 'rgba(153,102,255,1)');
+createSparkline(document.getElementById('revenueSparkline'), {{ revenueSparkline|default([])|json_encode|raw }}, 'rgba(75,192,192,1)');
+</script>
+
+<style>
+.dashboard-card {
+    min-height: 80px;
+    border-radius: 0.8rem;
+    transition: all 0.3s ease;
+    background-color: #F5F1E6;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .dashboard-card {
+        min-height: 70px;
+    }
+}
+</style>
+{% endblock %}

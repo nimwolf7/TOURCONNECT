@@ -1,0 +1,143 @@
+<style>
+    .page-card {
+        background: #F5F1E6;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #13616C, #0E4A52);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid rgba(255,255,255,0.2);
+    }
+    .page-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .page-header h3 i {
+        font-size: 1.3rem;
+    }
+    .page-body {
+        padding: 30px;
+    }
+    .readonly-field {
+        margin-bottom: 20px;
+        font-size: 1rem;
+        color: #333;
+        background: #e9ecef;
+        border-radius: 8px;
+        padding: 12px 18px;
+        border: 1px solid #d1d5db;
+        font-weight: 500;
+    }
+</style>
+<div class="page-card">
+    <div class="page-header">
+        <h3>
+            <i class="fas fa-box"></i>
+            {{ form.vars.value.id ? 'Edit Inventory' : 'New Inventory' }}
+        </h3>
+    </div>
+    <div class="page-body">
+        <style>
+            .form-group {
+                margin-bottom: 25px;
+            }
+            .form-label {
+                display: block;
+                font-weight: 600;
+                color: #0E4A52;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+            .form-control {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                font-size: 15px;
+                transition: all 0.3s ease;
+                background: #F5F1E6;
+            }
+            .form-control:focus {
+                outline: none;
+                border-color: #13616C;
+                box-shadow: 0 0 0 3px rgba(19,97,108,0.1);
+            }
+            .form-control::placeholder {
+                color: #999;
+            }
+            .form-errors {
+                color: #dc3545;
+                font-size: 13px;
+                margin-top: 5px;
+                display: block;
+            }
+            .button-group {
+                display: flex;
+                justify-content: flex-end;
+                gap: 12px;
+                padding-top: 25px;
+                border-top: 2px solid #e0e0e0;
+                margin-top: 10px;
+            }
+            .save-btn {
+                background: linear-gradient(135deg, #28a745, #218838);
+                color: white;
+                border: none;
+                padding: 12px 28px;
+                border-radius: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+            }
+            .save-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(40,167,69,0.4);
+            }
+            .save-btn:active {
+                transform: translateY(0);
+            }
+            .save-btn i {
+                font-size: 14px;
+            }
+        </style>
+        {% if service is defined and service %}
+            <div class="readonly-field">
+                <strong>Service:</strong> {{ service.title }} <span class="text-muted">(#{{ service.id }})</span>
+            </div>
+        {% endif %}
+        {{ form_start(form) }}
+            <div class="form-group">
+                {{ form_label(form.quantityAvailable, 'Quantity Available', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.quantityAvailable, {'attr': {'class': 'form-control', 'placeholder': 'Enter quantity'}}) }}
+                {{ form_errors(form.quantityAvailable) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.lastUpdated, 'Last Updated', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.lastUpdated, {'attr': {'class': 'form-control', 'placeholder': 'Select date and time'}}) }}
+                {{ form_errors(form.lastUpdated) }}
+            </div>
+            <div class="button-group">
+                <button type="submit" class="save-btn">
+                    <i class="fa-solid fa-check"></i>
+                    {{ button_label|default('Save') }}
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>

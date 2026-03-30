@@ -1,0 +1,13 @@
+# Security translations
+'Invalid credentials.': 'Invalid credentials.'
+'The presented password is invalid.': 'The presented password is invalid.'
+'Username could not be found.': 'Username could not be found.'
+'Account locked.': 'Your account has been locked.'
+'Too many failed login attempts, please try again later.': 'Too many failed login attempts. Please try again later.'
+'Invalid CSRF token.': 'Invalid security token. Please try again.'
+'Authentication credentials could not be found.': 'Authentication credentials could not be found.'
+'Authentication request could not be processed due to a system problem.': 'Authentication request could not be processed.'
+'Invalid or expired security token.': 'Invalid or expired security token.'
+'Not privileged to request the resource.': 'You do not have permission to access this resource.'
+'Access Denied.': 'Access Denied.'
+'Full authentication is required to access this resource.': 'Please log in to access this resource.'

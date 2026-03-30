@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">Search Results</h2>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="get" action="{{ path('app_search') }}" class="mb-4 d-flex">
+        <input type="text" name="q" class="form-control me-2" placeholder="Search for bookings, payments, or services..." value="{{ app.request.get('q') }}">
+        <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+        </button>
+    </form>
+
+    <!-- Search Results -->
+    {% if results is defined and results|length > 0 %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Entity</th>
+                            <th>Details</th>
+                            <th>Date</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results %}
+                            <tr>
+                                <td>{{ item.id }}</td>
+                                <td>{{ item.entityType }}</td>
+                                <td>{{ item.description }}</td>
+                                <td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '-' }}</td>
+                                <td class="text-center">
+                                    <a href="{{ item.link }}" class="btn btn-sm btn-info text-white">
+                                        <i class="fa-solid fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-secondary text-center mt-4" role="alert">
+            No results found for your search.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.table th {
+    background-color: #0E4A52 !important;
+    color: #fff !important;
+}
+.btn-primary {
+    background-color: #0E4A52;
+    border-color: #0E4A52;
+}
+.btn-primary:hover {
+    background-color: #13616c;
+}
+.card {
+    border-radius: 12px;
+}
+</style>
+{% endblock %}

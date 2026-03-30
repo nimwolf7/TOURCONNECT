@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: start_go_root_password
+      MYSQL_DATABASE: start_go_db
+      MYSQL_USER: start_go_user
+      MYSQL_PASSWORD: start_go_password
+    ports:
+      - "3308:3306"
+    volumes: 
+      - mysql_data:/var/lib/mysql
+    networks:
+      - start_go_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: start_go_user
+      PMA_PASSWORD: start_go_password
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - start_go_network
+
+volumes:
+  mysql_data:
+
+
+networks:
+  start_go_network:
+    
+
+

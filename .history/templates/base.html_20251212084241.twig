@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Tour Connect{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>TC</text></svg>">
+
+        {% block stylesheets %}{% endblock %}
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body style="margin:0; font-family: Arial, sans-serif;">
+
+        <!-- Navbar -->
+        <div style="background-color: #1b3a4b; color: white; padding: 10px; display: flex; align-items: center;">
+            <img src="{{ asset('images/webdevelop3.png') }}" alt="My image" style="height: 40px; margin-right: 10px;">
+            <span style="font-weight: bold; font-size: 20px; color: white;">Tour Connect</span>
+            <div style="margin-left: auto;">
+                <a href="{{ path('app_home') }}" style="color: white; margin: 0 10px; text-decoration: none;">Home</a>
+                <a href="#" style="color: white; margin: 0 10px; text-decoration: none;">Search</a>
+                <a href="#" style="color: white; margin: 0 10px; text-decoration: none;">Notifications</a>
+                <a href="#" style="color: white; margin: 0 10px; text-decoration: none;">Profile</a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <main style="padding: 40px; min-height: 80vh; background-color: #f9f9f9;">
+            {% block body %}
+                <h1>Default content: nimcel hello world</h1>
+            {% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <div style="background-color: #1b3a4b; color: white; text-align: center; padding: 10px;">
+            © 2025 Tour Connect. All rights reserved.
+        </div>
+
+    </body>
+</html>

@@ -1,0 +1,261 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Budget Tracker | Tour Connect{% endblock %}
+
+{% block body %}
+<style>
+    .list-card {
+        background: #F5F1E6;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .list-header {
+        background: linear-gradient(135deg, #13616C, #0E4A52);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid rgba(255,255,255,0.2);
+    }
+
+    .list-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .list-header h3 i {
+        font-size: 1.3rem;
+    }
+
+    .add-btn-header {
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: #0E4A52;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .add-btn-header:hover {
+        background: #F5F1E6;
+        color: #0E4A52;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .list-body {
+        padding: 35px 30px;
+        background: #f8f9fa;
+    }
+
+    .data-table {
+        width: 100%;
+        background: #F5F1E6;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    }
+
+    .data-table thead th {
+        padding: 16px 20px;
+        font-weight: 600;
+        color: #0E4A52;
+        text-align: center;
+        font-size: 14px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.2s ease;
+    }
+
+    .data-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .data-table tbody td {
+        padding: 16px 20px;
+        color: #333;
+        font-size: 15px;
+        text-align: center;
+    }
+
+    .budget-id {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #13616C;
+    }
+
+    .amount-planned {
+        font-weight: 600;
+        color: #0E4A52;
+    }
+
+    .amount-spent {
+        font-weight: 600;
+        color: #dc3545;
+    }
+
+    .category-cell {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .action-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        border: 1px solid;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .btn-view {
+        background: #F5F1E6;
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .btn-view:hover {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-edit {
+        background: #F5F1E6;
+        border-color: #0E4A52;
+        color: #0E4A52;
+    }
+
+    .btn-edit:hover {
+        background: #0E4A52;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #F5F1E6;
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .btn-delete:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 15px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 16px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="list-card">
+        <div class="list-header">
+            <h3>
+                <i class="fa-solid fa-wallet"></i>
+                Budget Tracker
+            </h3>
+            <a href="{{ path('app_budget_tracker_new') }}" class="add-btn-header">
+                <i class="fa-solid fa-plus"></i>
+                Add New
+            </a>
+        </div>
+
+        <div class="list-body">
+            {% if budget_trackers is not empty %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Category</th>
+                                <th>Planned (₱)</th>
+                                <th>Spent (₱)</th>
+                                <th>Date Range</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for budget_tracker in budget_trackers %}
+                                <tr>
+                                    <td><span class="budget-id">{{ budget_tracker.id }}</span></td>
+                                    <td>{{ budget_tracker.user.username }}</td>
+                                    <td class="category-cell">{{ budget_tracker.category }}</td>
+                                    <td><span class="amount-planned">{{ budget_tracker.amountPlanned|number_format(2) }}</span></td>
+                                    <td><span class="amount-spent">{{ budget_tracker.amountSpent|number_format(2) }}</span></td>
+                                    <td>{{ budget_tracker.dateRange }}</td>
+                                    <td>
+                                        <a href="{{ path('app_budget_tracker_show', {'id': budget_tracker.id}) }}" 
+                                           class="action-btn btn-view me-1" title="View Details">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
+                                        <a href="{{ path('app_budget_tracker_edit', {'id': budget_tracker.id}) }}" 
+                                           class="action-btn btn-edit me-1" title="Edit Entry">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <form method="post" action="{{ path('app_budget_tracker_delete', {'id': budget_tracker.id}) }}" 
+                                              style="display:inline-block;" 
+                                              onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ budget_tracker.id) }}">
+                                            <button class="action-btn btn-delete" title="Delete Entry">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>No budget tracker entries found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

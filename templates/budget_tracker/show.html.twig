@@ -1,0 +1,247 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Budget Tracker Details | Tour Connect{% endblock %}
+
+{% block body %}
+<style>
+    .details-card {
+        background: #F5F1E6;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .details-header {
+        background: linear-gradient(135deg, #13616C, #0E4A52);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid rgba(255,255,255,0.2);
+    }
+
+    .details-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .details-header h3 i {
+        font-size: 1.3rem;
+    }
+
+    .details-body {
+        padding: 35px 30px;
+    }
+
+    .info-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #F5F1E6;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+    }
+
+    .info-table tr {
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .info-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .info-table th {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 16px 20px;
+        font-weight: 600;
+        color: #0E4A52;
+        text-align: left;
+        width: 200px;
+        font-size: 14px;
+    }
+
+    .info-table td {
+        padding: 16px 20px;
+        color: #333;
+        font-size: 15px;
+        background: #F5F1E6;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 25px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .back-btn {
+        background: #F5F1E6;
+        color: #0E4A52;
+        border: 2px solid #0E4A52;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #0E4A52;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(14,74,82,0.3);
+    }
+
+    .edit-btn {
+        background: linear-gradient(135deg, #0E4A52, #13616C);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(14,74,82,0.3);
+    }
+
+    .edit-btn:hover {
+        color: white;
+        background: linear-gradient(135deg, #13616C, #176873);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(14,74,82,0.4);
+    }
+
+    .delete-btn {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    }
+
+    .delete-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(220,53,69,0.4);
+    }
+
+    .delete-btn:active,
+    .edit-btn:active,
+    .back-btn:active {
+        transform: translateY(0);
+    }
+
+    .budget-id {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #13616C;
+    }
+
+    .amount-planned {
+        font-weight: 600;
+        color: #0E4A52;
+        font-size: 16px;
+    }
+
+    .amount-spent {
+        font-weight: 600;
+        color: #dc3545;
+        font-size: 16px;
+    }
+
+    .category-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white;
+        box-shadow: 0 2px 6px rgba(108,117,125,0.3);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="details-card">
+        <div class="details-header">
+            <h3>
+                <i class="fa-solid fa-wallet"></i>
+                Budget Tracker Details
+            </h3>
+        </div>
+
+        <div class="details-body">
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td><span class="budget-id">{{ budget_tracker.id }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>User</th>
+                        <td>{{ budget_tracker.user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td><span class="category-badge">{{ budget_tracker.category }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Amount Planned</th>
+                        <td><span class="amount-planned">₱{{ budget_tracker.amountPlanned|number_format(2) }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Amount Spent</th>
+                        <td><span class="amount-spent">₱{{ budget_tracker.amountSpent|number_format(2) }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Date Range</th>
+                        <td>{{ budget_tracker.dateRange }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="button-group">
+                <!-- Back Button -->
+                <a href="{{ path('app_budget_tracker_index') }}" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to List
+                </a>
+
+                <!-- Edit Button -->
+                <a href="{{ path('app_budget_tracker_edit', {'id': budget_tracker.id}) }}" class="edit-btn">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Edit
+                </a>
+
+                <!-- Delete Button -->
+                {{ include('budget_tracker/_delete_form.html.twig', {'button_class': 'delete-btn', 'button_icon': '<i class="fa-solid fa-trash"></i>'}) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

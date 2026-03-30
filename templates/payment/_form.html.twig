@@ -1,0 +1,44 @@
+{# templates/payment/_form.html.twig #}
+
+
+{{ form_start(form) }}
+<div class="space-y-4">
+    <div id="booking-select-wrapper">
+        {{ form_row(form.booking, {'attr': {'class': 'w-full px-4 py-2 border rounded-lg', 'id': 'payment_booking'}}) }}
+    </div>
+    {{ form_row(form.amount, {'attr': {'class': 'w-full px-4 py-2 border rounded-lg', 'id': 'payment_amount'}}) }}
+    {{ form_row(form.method, {'attr': {'class': 'w-full px-4 py-2 border rounded-lg'}}) }}
+    {{ form_row(form.paymentStatus, {'attr': {'class': 'w-full px-4 py-2 border rounded-lg'}}) }}
+    {{ form_row(form.paymentDate, {'attr': {'class': 'w-full px-4 py-2 border rounded-lg'}}) }}
+
+    <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+        {{ button_label|default('Save') }}
+    </button>
+</div>
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookingSelect = document.getElementById('payment_booking');
+    const amountInput = document.getElementById('payment_amount');
+    // Build a map of booking id to service price from data attributes
+    let bookingPrices = {};
+    if (bookingSelect) {
+        Array.from(bookingSelect.options).forEach(opt => {
+            if (opt.value && opt.dataset.price) {
+                bookingPrices[opt.value] = parseFloat(opt.dataset.price);
+            }
+        });
+    }
+    function updateAmount() {
+        const bookingId = bookingSelect ? bookingSelect.value : null;
+        const price = bookingPrices[bookingId] || '';
+        if (amountInput) {
+            amountInput.value = price;
+        }
+    }
+    if (bookingSelect && amountInput) {
+        bookingSelect.addEventListener('change', updateAmount);
+    }
+});
+</script>

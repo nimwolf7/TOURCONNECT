@@ -1,0 +1,374 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bookings | Tour Connect{% endblock %}
+
+{% block body %}
+<style>
+    .page-card {
+        background: #F5F1E6;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #13616C, #0E4A52);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid rgba(255,255,255,0.2);
+    }
+
+    .page-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header h3 i {
+        font-size: 1.3rem;
+    }
+
+    .create-btn {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .create-btn:hover {
+        background: rgba(255,255,255,0.3);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        padding: 25px 30px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .filter-input,
+    .filter-select {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #F5F1E6;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        border-color: #13616C;
+        box-shadow: 0 0 0 3px rgba(19,97,108,0.1);
+        outline: none;
+    }
+
+    .search-btn {
+        background: linear-gradient(135deg, #13616C, #0E4A52);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(19,97,108,0.3);
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(19,97,108,0.4);
+    }
+
+    .page-body {
+        padding: 30px;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #F5F1E6;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, #0E4A52, #0A3940);
+        color: white;
+    }
+
+    .data-table thead th {
+        padding: 16px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table tbody td {
+        padding: 16px;
+        text-align: center;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 14px;
+    }
+
+    .data-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .data-table tbody tr:hover {
+        background: linear-gradient(90deg, #f0f9fa, #ffffff);
+        transform: scale(1.01);
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-confirmed {
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+        box-shadow: 0 2px 8px rgba(40,167,69,0.3);
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #ffc107, #e0a800);
+        color: #000;
+        box-shadow: 0 2px 8px rgba(255,193,7,0.3);
+    }
+
+    .status-cancelled {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        box-shadow: 0 2px 8px rgba(220,53,69,0.3);
+    }
+
+    .status-default {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white;
+        box-shadow: 0 2px 8px rgba(108,117,125,0.3);
+    }
+
+    .action-btn {
+        border: 2px solid;
+        background: transparent;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        margin: 0 3px;
+    }
+
+    .action-btn-view {
+        border-color: #0E4A52;
+        color: #0E4A52;
+    }
+
+    .action-btn-view:hover {
+        background: #0E4A52;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(14,74,82,0.3);
+    }
+
+    .action-btn-edit {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+    .action-btn-edit:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+    }
+
+    .action-btn-delete {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .action-btn-delete:hover {
+        background: #dc3545;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    }
+
+    .empty-state {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        border: 2px solid #ffc107;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        color: #856404;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.7;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+
+    .booking-id {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #13616C;
+    }
+
+    .amount {
+        font-weight: 600;
+        color: #28a745;
+    }
+
+    @media (max-width: 768px) {
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="page-card">
+        <div class="page-header">
+            <h3>
+                <i class="fa-solid fa-calendar-check"></i>
+                Booking List
+            </h3>
+            <a href="{{ path('app_booking_new') }}" class="create-btn">
+                <i class="fa-solid fa-plus"></i>
+                New Booking
+            </a>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="filter-section">
+            <form method="get" class="filter-form">
+                <select name="status" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="Confirmed" {{ app.request.get('status') == 'Confirmed' ? 'selected' }}>Confirmed</option>
+                    <option value="Pending" {{ app.request.get('status') == 'Pending' ? 'selected' }}>Pending</option>
+                    <option value="Cancelled" {{ app.request.get('status') == 'Cancelled' ? 'selected' }}>Cancelled</option>
+                </select>
+                
+                {# Filter button removed, form auto-submits on dropdown change #}
+            </form>
+        </div>
+
+        <!-- Booking Table -->
+        <div class="page-body">
+            {% if bookings is not empty %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Booking Date</th>
+                                <th>Total Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                                <tr>
+                                    <td><span class="booking-id">{{ booking.id }}</span></td>
+                                    <td>{{ booking.quantity }}</td>
+                                    <td>
+                                        {% if booking.status == 'Confirmed' %}
+                                            <span class="status-badge status-confirmed">Confirmed</span>
+                                        {% elseif booking.status == 'Pending' %}
+                                            <span class="status-badge status-pending">Pending</span>
+                                        {% elseif booking.status == 'Cancelled' %}
+                                            <span class="status-badge status-cancelled">Cancelled</span>
+                                        {% else %}
+                                            <span class="status-badge status-default">{{ booking.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ booking.bookingDate ? booking.bookingDate|date('Y-m-d H:i') : '-' }}</td>
+                                    <td><span class="amount">₱{{ booking.totalAmount|number_format(2) }}</span></td>
+                                    <td>
+                                        <a href="{{ path('app_booking_show', {'id': booking.id}) }}" class="action-btn action-btn-view">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_booking_edit', {'id': booking.id}) }}" class="action-btn action-btn-edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_booking_delete', {'id': booking.id}) }}" 
+                                              onsubmit="return confirm('Are you sure you want to delete this booking?');" 
+                                              style="display:inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
+                                            <button class="action-btn action-btn-delete">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                    <p>No bookings found</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
