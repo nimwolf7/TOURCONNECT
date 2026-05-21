@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Payment;
 use App\Form\PaymentType;
 use App\Repository\PaymentRepository;
+use App\Service\PayMongoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,7 +20,11 @@ class PaymentController extends AbstractController
     #[Route('/', name: 'app_payment_index', methods: ['GET'])]
     public function index(PaymentRepository $paymentRepository): Response
     {
-        $payments = $paymentRepository->findAll();
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        $payments = $this->isCustomerOnly($currentUser) && $currentUser instanceof User
+            ? $paymentRepository->findBy(['owner' => $currentUser], ['id' => 'DESC'])
+            : $paymentRepository->findAll();
 
         // Compute total amount
         $totalAmount = array_reduce($payments, fn($sum, $p) => $sum + $p->getAmount(), 0);
@@ -29,25 +36,53 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/new', name: 'app_payment_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PayMongoService $payMongoService): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
         $payment = new Payment();
         $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-              $payment->setOwner($this->getUser());
-              $entityManager->persist($payment);
-              $entityManager->flush();
+            if (!$currentUser instanceof User) {
+                throw $this->createAccessDeniedException('Only logged in users can create payments.');
+            }
+
+            if ($this->isCustomerOnly($currentUser)) {
+                $bookingUser = $payment->getBooking()?->getUser();
+                if ($bookingUser !== $currentUser) {
+                    throw $this->createAccessDeniedException('You can only pay for your own booking.');
+                }
+            }
+
+            $payment->setOwner($currentUser);
+            $payment->setAmount((string) ($payment->getBooking()?->getTotalAmount() ?? $payment->getAmount()));
+            $payment->setPaymentDate(new \DateTimeImmutable());
+            if ($payment->getMethod() === 'PayMongo') {
+                $payment->setPaymentStatus('Pending');
+            }
+
+            $entityManager->persist($payment);
+            $entityManager->flush();
 
             // Log activity
             $activityLog = new \App\Entity\ActivityLog();
-            $activityLog->setUser($this->getUser());
+            $activityLog->setUser($currentUser);
             $activityLog->setAction('Created payment #' . $payment->getId());
             $activityLog->setTimestamp(new \DateTime());
             $activityLog->setIpAddress($request->getClientIp() ?? 'unknown');
             $entityManager->persist($activityLog);
             $entityManager->flush();
+
+            if ($payment->getMethod() === 'PayMongo') {
+                try {
+                    $checkoutUrl = $payMongoService->createCheckoutUrl($payment);
+                    return new RedirectResponse($checkoutUrl);
+                } catch (\Throwable $exception) {
+                    $this->addFlash('danger', 'PayMongo checkout error: ' . $exception->getMessage());
+                }
+            }
 
             $this->addFlash('success', 'Payment added successfully!');
             return $this->redirectToRoute('app_payment_index', [], Response::HTTP_SEE_OTHER);
@@ -61,6 +96,12 @@ class PaymentController extends AbstractController
     #[Route('/{id}', name: 'app_payment_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(Payment $payment): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User && $payment->getOwner() !== $currentUser) {
+            throw $this->createAccessDeniedException('You can only view your own payments.');
+        }
+
         return $this->render('payment/show.html.twig', [
             'payment' => $payment,
         ]);
@@ -69,16 +110,32 @@ class PaymentController extends AbstractController
     #[Route('/{id}/edit', name: 'app_payment_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Payment $payment, EntityManagerInterface $entityManager): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User && $payment->getOwner() !== $currentUser) {
+            throw $this->createAccessDeniedException('You can only edit your own payments.');
+        }
+
         // Staff can now edit any payment, including those created by admin
         $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User) {
+                $payment->setOwner($currentUser);
+            }
+            $payment->setAmount((string) ($payment->getBooking()?->getTotalAmount() ?? $payment->getAmount()));
             $entityManager->flush();
 
             // Log activity
             $activityLog = new \App\Entity\ActivityLog();
-            $activityLog->setUser($this->getUser());
+            $activityLog->setUser($currentUser);
             $activityLog->setAction('Edited payment #' . $payment->getId());
             $activityLog->setTimestamp(new \DateTime());
             $activityLog->setIpAddress($request->getClientIp() ?? 'unknown');
@@ -100,6 +157,12 @@ class PaymentController extends AbstractController
     {
         // Restrict staff to only delete their own payments
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Only logged in users can delete payments.');
+        }
+        if ($this->isCustomerOnly($user) && $user instanceof User && $payment->getOwner() !== $user) {
+            throw $this->createAccessDeniedException('You can only delete your own payments.');
+        }
         $booking = $payment->getBooking();
         if (in_array('ROLE_STAFF', $user->getRoles(), true)) {
             if (!$booking || $booking->getUser() !== $user) {
@@ -122,5 +185,35 @@ class PaymentController extends AbstractController
         }
 
         return $this->redirectToRoute('app_payment_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/checkout', name: 'app_payment_checkout', methods: ['GET'])]
+    public function checkout(Payment $payment, PayMongoService $payMongoService): Response
+    {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User && $payment->getOwner() !== $currentUser) {
+            throw $this->createAccessDeniedException('You can only checkout your own payment.');
+        }
+
+        if ($payment->getMethod() !== 'PayMongo') {
+            $this->addFlash('warning', 'Selected payment is not a PayMongo payment.');
+            return $this->redirectToRoute('app_payment_index');
+        }
+
+        try {
+            $checkoutUrl = $payMongoService->createCheckoutUrl($payment);
+            return new RedirectResponse($checkoutUrl);
+        } catch (\Throwable $exception) {
+            $this->addFlash('danger', 'PayMongo checkout error: ' . $exception->getMessage());
+            return $this->redirectToRoute('app_payment_index');
+        }
+    }
+
+    private function isCustomerOnly(?User $user): bool
+    {
+        return $user instanceof User
+            && !in_array('ROLE_ADMIN', $user->getRoles(), true)
+            && !in_array('ROLE_STAFF', $user->getRoles(), true);
     }
 }

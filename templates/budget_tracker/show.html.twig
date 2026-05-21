@@ -186,60 +186,72 @@
     }
 </style>
 
-<div class="container mt-4">
-    <div class="details-card">
-        <div class="details-header">
-            <h3>
-                <i class="fa-solid fa-wallet"></i>
-                Budget Tracker Details
-            </h3>
-        </div>
+<div class="admin-page">
+    <div class="container mt-4">
+        <div class="details-card">
+            <div class="details-header">
+                <h3>
+                    <i class="fa-solid fa-wallet"></i>
+                    Budget Tracker Details
+                </h3>
+            </div>
 
-        <div class="details-body">
-            <table class="info-table">
-                <tbody>
-                    <tr>
-                        <th>ID</th>
-                        <td><span class="budget-id">{{ budget_tracker.id }}</span></td>
-                    </tr>
-                    <tr>
-                        <th>User</th>
-                        <td>{{ budget_tracker.user.username }}</td>
-                    </tr>
-                    <tr>
-                        <th>Category</th>
-                        <td><span class="category-badge">{{ budget_tracker.category }}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Amount Planned</th>
-                        <td><span class="amount-planned">₱{{ budget_tracker.amountPlanned|number_format(2) }}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Amount Spent</th>
-                        <td><span class="amount-spent">₱{{ budget_tracker.amountSpent|number_format(2) }}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Date Range</th>
-                        <td>{{ budget_tracker.dateRange }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="details-body">
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                            <th>ID</th>
+                            <td><span class="budget-id">{{ budget_tracker.id }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>User</th>
+                            <td>{{ budget_tracker.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Booking</th>
+                            <td>
+                                {% if budget_tracker.booking %}
+                                    #{{ budget_tracker.booking.id }}
+                                    {% if budget_tracker.booking.service %}
+                                        - {{ budget_tracker.booking.service.title }}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Category</th>
+                            <td><span class="category-badge">{{ budget_tracker.category }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Amount Planned</th>
+                            <td><span class="amount-planned">₱{{ budget_tracker.amountPlanned|number_format(2) }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Amount Spent</th>
+                            <td><span class="amount-spent">₱{{ budget_tracker.amountSpent|number_format(2) }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Date Range</th>
+                            <td>{{ budget_tracker.dateRange }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <div class="button-group">
-                <!-- Back Button -->
-                <a href="{{ path('app_budget_tracker_index') }}" class="back-btn">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Back to List
-                </a>
+                <div class="button-group">
+                    <a href="{{ path('app_budget_tracker_index') }}" class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back to List
+                    </a>
 
-                <!-- Edit Button -->
-                <a href="{{ path('app_budget_tracker_edit', {'id': budget_tracker.id}) }}" class="edit-btn">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    Edit
-                </a>
+                    <a href="{{ path('app_budget_tracker_edit', {'id': budget_tracker.id}) }}" class="edit-btn">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        Edit
+                    </a>
 
-                <!-- Delete Button -->
-                {{ include('budget_tracker/_delete_form.html.twig', {'button_class': 'delete-btn', 'button_icon': '<i class="fa-solid fa-trash"></i>'}) }}
+                    {{ include('budget_tracker/_delete_form.html.twig', {'button_class': 'delete-btn', 'button_icon': '<i class="fa-solid fa-trash"></i>'}) }}
+                </div>
             </div>
         </div>
     </div>

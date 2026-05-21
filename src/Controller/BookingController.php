@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\User;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,10 +18,17 @@ final class BookingController extends AbstractController
     #[Route(name: 'app_booking_index', methods: ['GET'])]
     public function index(Request $request, BookingRepository $bookingRepository): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
         $search = $request->query->get('search');
         $status = $request->query->get('status');
 
         $queryBuilder = $bookingRepository->createQueryBuilder('b');
+        if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User) {
+            $queryBuilder
+                ->andWhere('b.user = :currentUser')
+                ->setParameter('currentUser', $currentUser);
+        }
 
         $bookings = $queryBuilder->orderBy('b.bookingDate', 'DESC')->getQuery()->getResult();
         if ($search) {
@@ -49,17 +57,24 @@ final class BookingController extends AbstractController
     #[Route('/new', name: 'app_booking_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
         $booking = new Booking();
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Deduct stock from selected service
+            if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User) {
+                $booking->setUser($currentUser);
+                $booking->setStatus('Pending');
+            }
+            // Deduct slots from selected service
             $service = $booking->getService();
             $quantity = $booking->getQuantity();
             if ($service && $quantity > 0) {
-                $currentStock = $service->getStock();
-                $service->setStock(max(0, $currentStock - $quantity));
+                $booking->setTotalAmount(number_format(((float) $service->getPrice()) * $quantity, 2, '.', ''));
+                $currentSlots = $service->getSlots() ?? 0;
+                $service->setSlots(max(0, $currentSlots - $quantity));
                 $entityManager->persist($service);
             }
             $entityManager->persist($booking);
@@ -87,6 +102,12 @@ final class BookingController extends AbstractController
     #[Route('/{id}', name: 'app_booking_show', methods: ['GET'])]
     public function show(Booking $booking): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User && $booking->getUser() !== $currentUser) {
+            throw $this->createAccessDeniedException('You can only view your own bookings.');
+        }
+
         return $this->render('booking/show.html.twig', [
             'booking' => $booking,
         ]);
@@ -95,11 +116,34 @@ final class BookingController extends AbstractController
     #[Route('/{id}/edit', name: 'app_booking_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Booking $booking, EntityManagerInterface $entityManager): Response
     {
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User && $booking->getUser() !== $currentUser) {
+            throw $this->createAccessDeniedException('You can only edit your own bookings.');
+        }
+
+        $originalStatus = $booking->getStatus();
         // Staff can now edit any booking, including those created by admin
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->isCustomerOnly($currentUser) && $currentUser instanceof User) {
+                $booking->setUser($currentUser);
+                $booking->setStatus($originalStatus ?? 'Pending');
+                $this->addFlash('info', 'Only admins can update booking status.');
+            }
+            $service = $booking->getService();
+            $quantity = $booking->getQuantity();
+            if ($service && $quantity > 0) {
+                $booking->setTotalAmount(number_format(((float) $service->getPrice()) * $quantity, 2, '.', ''));
+            }
             $entityManager->flush();
 
             // Log activity
@@ -112,7 +156,7 @@ final class BookingController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('info', '✏️ Booking updated successfully!');
-            return $this->redirectToRoute('app_booking_index');
+            return $this->redirectToRoute('app_booking_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('booking/edit.html.twig', [
@@ -126,6 +170,12 @@ final class BookingController extends AbstractController
     {
         // Restrict staff to only delete their own bookings
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Only logged in users can delete bookings.');
+        }
+        if ($this->isCustomerOnly($user) && $user instanceof User && $booking->getUser() !== $user) {
+            throw $this->createAccessDeniedException('You can only delete your own bookings.');
+        }
         if (in_array('ROLE_STAFF', $user->getRoles(), true)) {
             if ($booking->getUser() !== $user) {
                 throw $this->createAccessDeniedException('You can only delete your own bookings.');
@@ -148,5 +198,12 @@ final class BookingController extends AbstractController
         }
 
         return $this->redirectToRoute('app_booking_index');
+    }
+
+    private function isCustomerOnly(?User $user): bool
+    {
+        return $user instanceof User
+            && !in_array('ROLE_ADMIN', $user->getRoles(), true)
+            && !in_array('ROLE_STAFF', $user->getRoles(), true);
     }
 }

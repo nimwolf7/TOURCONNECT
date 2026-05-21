@@ -41,6 +41,7 @@ class PaymentType extends AbstractType
                     'Cash' => 'Cash',
                     'Credit Card' => 'Credit Card',
                     'Gcash' => 'Gcash',
+                    'PayMongo' => 'PayMongo',
                 ],
                 'attr' => ['class' => 'border rounded px-2 py-1 w-full']
             ])

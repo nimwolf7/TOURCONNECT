@@ -166,7 +166,7 @@
         letter-spacing: 0.5px;
     }
 
-    .status-confirmed {
+    .status-complete {
         background: linear-gradient(135deg, #28a745, #218838);
         color: white;
         box-shadow: 0 2px 8px rgba(40,167,69,0.3);
@@ -182,6 +182,12 @@
         background: linear-gradient(135deg, #dc3545, #c82333);
         color: white;
         box-shadow: 0 2px 8px rgba(220,53,69,0.3);
+    }
+
+    .status-refund {
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        color: white;
+        box-shadow: 0 2px 8px rgba(2,132,199,0.3);
     }
 
     .status-default {
@@ -281,6 +287,8 @@
     }
 </style>
 
+<div class="admin-page">
+
 <div class="container mt-4">
     <div class="page-card">
         <div class="page-header">
@@ -299,8 +307,9 @@
             <form method="get" class="filter-form">
                 <select name="status" class="filter-select" onchange="this.form.submit()">
                     <option value="">All Statuses</option>
-                    <option value="Confirmed" {{ app.request.get('status') == 'Confirmed' ? 'selected' }}>Confirmed</option>
                     <option value="Pending" {{ app.request.get('status') == 'Pending' ? 'selected' }}>Pending</option>
+                    <option value="Complete" {{ app.request.get('status') == 'Complete' ? 'selected' }}>Complete</option>
+                    <option value="Refund" {{ app.request.get('status') == 'Refund' ? 'selected' }}>Refund</option>
                     <option value="Cancelled" {{ app.request.get('status') == 'Cancelled' ? 'selected' }}>Cancelled</option>
                 </select>
                 
@@ -329,10 +338,12 @@
                                     <td><span class="booking-id">{{ booking.id }}</span></td>
                                     <td>{{ booking.quantity }}</td>
                                     <td>
-                                        {% if booking.status == 'Confirmed' %}
-                                            <span class="status-badge status-confirmed">Confirmed</span>
-                                        {% elseif booking.status == 'Pending' %}
+                                        {% if booking.status == 'Pending' %}
                                             <span class="status-badge status-pending">Pending</span>
+                                        {% elseif booking.status == 'Complete' %}
+                                            <span class="status-badge status-complete">Complete</span>
+                                        {% elseif booking.status == 'Refund' %}
+                                            <span class="status-badge status-refund">Refund</span>
                                         {% elseif booking.status == 'Cancelled' %}
                                             <span class="status-badge status-cancelled">Cancelled</span>
                                         {% else %}
@@ -370,5 +381,6 @@
             {% endif %}
         </div>
     </div>
+</div>
 </div>
 {% endblock %}

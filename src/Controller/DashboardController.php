@@ -8,6 +8,7 @@ use App\Repository\BookingRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\ActivityLogRepository;
 use App\Repository\InventoryRepository;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,40 +28,78 @@ class DashboardController extends AbstractController
         InventoryRepository $inventoryRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_STAFF')) {
-            throw $this->createAccessDeniedException('Access Denied.');
-        }
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        $isCustomerOnly = $currentUser instanceof User
+            && !$this->isGranted('ROLE_ADMIN')
+            && !$this->isGranted('ROLE_STAFF');
+
         // Basic Counts
-        $totalUsers = $userRepository->count([]);
+        $totalUsers = $isCustomerOnly ? 0 : $userRepository->count([]);
         $totalServices = $serviceRepository->count([]);
-        $totalBookings = $bookingRepository->count([]);
-        $totalPayments = $paymentRepository->count([]);
-        $totalInventory = $inventoryRepository->count([]);
+        $totalInventory = $isCustomerOnly ? 0 : $inventoryRepository->count([]);
 
-        // Total Revenue (sum of confirmed payments)
-        $query = $entityManager->createQuery(
-            'SELECT SUM(p.amount) FROM App\Entity\Payment p WHERE p.paymentStatus = :status'
-        )->setParameter('status', 'Confirmed');
-        $totalRevenue = $query->getSingleScalarResult() ?? 0;
+        if ($isCustomerOnly && $currentUser instanceof User) {
+            $totalBookings = $bookingRepository->count(['user' => $currentUser]);
+            $totalPayments = $paymentRepository->createQueryBuilder('p')
+                ->select('COUNT(p.id)')
+                ->join('p.booking', 'b')
+                ->where('b.user = :user')
+                ->setParameter('user', $currentUser)
+                ->getQuery()
+                ->getSingleScalarResult();
 
-        // Pending Bookings
-        $pendingBookings = $bookingRepository->count(['status' => 'Pending']);
+            $totalRevenue = $paymentRepository->createQueryBuilder('p')
+                ->select('COALESCE(SUM(p.amount), 0)')
+                ->join('p.booking', 'b')
+                ->where('b.user = :user')
+                ->andWhere('p.paymentStatus = :status')
+                ->setParameter('user', $currentUser)
+                ->setParameter('status', 'Confirmed')
+                ->getQuery()
+                ->getSingleScalarResult();
 
-        // Confirmed Bookings
-        $confirmedBookings = $bookingRepository->count(['status' => 'Confirmed']);
+            $pendingBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Pending']);
+            $confirmedBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Complete']);
+            $cancelledBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Cancelled']);
+            $refundedBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Refund']);
 
-        // Cancelled Bookings
-        $cancelledBookings = $bookingRepository->count(['status' => 'Cancelled']);
+            $recentBookings = $bookingRepository->createQueryBuilder('b')
+                ->where('b.user = :user')
+                ->setParameter('user', $currentUser)
+                ->orderBy('b.bookingDate', 'DESC')
+                ->setMaxResults(5)
+                ->getQuery()
+                ->getResult();
 
-        // Recent Bookings (last 5)
-        $recentBookings = $entityManager->createQuery(
-            'SELECT b FROM App\Entity\Booking b ORDER BY b.bookingDate DESC'
-        )->setMaxResults(5)->getResult();
+            $recentPayments = $paymentRepository->createQueryBuilder('p')
+                ->join('p.booking', 'b')
+                ->where('b.user = :user')
+                ->setParameter('user', $currentUser)
+                ->orderBy('p.paymentDate', 'DESC')
+                ->setMaxResults(5)
+                ->getQuery()
+                ->getResult();
+        } else {
+            $totalBookings = $bookingRepository->count([]);
+            $totalPayments = $paymentRepository->count([]);
+            $totalRevenue = $entityManager->createQuery(
+                'SELECT SUM(p.amount) FROM App\Entity\Payment p WHERE p.paymentStatus = :status'
+            )->setParameter('status', 'Confirmed')->getSingleScalarResult() ?? 0;
 
-        // Recent Payments (last 5)
-        $recentPayments = $entityManager->createQuery(
-            'SELECT p FROM App\Entity\Payment p ORDER BY p.paymentDate DESC'
-        )->setMaxResults(5)->getResult();
+            $pendingBookings = $bookingRepository->count(['status' => 'Pending']);
+            $confirmedBookings = $bookingRepository->count(['status' => 'Complete']);
+            $cancelledBookings = $bookingRepository->count(['status' => 'Cancelled']);
+            $refundedBookings = $bookingRepository->count(['status' => 'Refund']);
+
+            $recentBookings = $entityManager->createQuery(
+                'SELECT b FROM App\Entity\Booking b ORDER BY b.bookingDate DESC'
+            )->setMaxResults(5)->getResult();
+
+            $recentPayments = $entityManager->createQuery(
+                'SELECT p FROM App\Entity\Payment p ORDER BY p.paymentDate DESC'
+            )->setMaxResults(5)->getResult();
+        }
 
         // Recent Activity Logs (last 8)
         $recentActivities = $activityLogRepository->createQueryBuilder('a')
@@ -69,9 +108,9 @@ class DashboardController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        // Top 5 Services by Stock
+        // Top 5 Services by Slots
         $topServices = $entityManager->createQuery(
-            'SELECT s FROM App\Entity\Service s ORDER BY s.stock DESC'
+            'SELECT s FROM App\Entity\Service s ORDER BY s.slots DESC'
         )->setMaxResults(5)->getResult();
 
         // Sample Sparkline Data
@@ -82,6 +121,7 @@ class DashboardController extends AbstractController
         $revenueSparkline = [1000, 1500, 1300, 1800, 2000, 2200, 2500];
 
         return $this->render('dashboard/index.html.twig', [
+            'isCustomerOnly' => $isCustomerOnly,
             'totalUsers' => $totalUsers,
             'totalServices' => $totalServices,
             'totalBookings' => $totalBookings,
@@ -91,6 +131,7 @@ class DashboardController extends AbstractController
             'pendingBookings' => $pendingBookings,
             'confirmedBookings' => $confirmedBookings,
             'cancelledBookings' => $cancelledBookings,
+            'refundedBookings' => $refundedBookings,
             'recentBookings' => $recentBookings,
             'recentPayments' => $recentPayments,
             'recentActivities' => $recentActivities,

@@ -18,6 +18,11 @@ class BookingType extends AbstractType
             ->add('service', EntityType::class, [
                 'class' => Service::class,
                 'choice_label' => 'title',
+                'choice_attr' => static function (?Service $service): array {
+                    return [
+                        'data-price' => $service?->getPrice() ?? '0',
+                    ];
+                },
                 'label' => 'Service to Book',
                 'placeholder' => 'Select a service',
                 'required' => true,
@@ -26,7 +31,8 @@ class BookingType extends AbstractType
             ->add('status', \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
                 'choices' => [
                     'Pending' => 'Pending',
-                    'Confirmed' => 'Confirmed',
+                    'Complete' => 'Complete',
+                    'Refund' => 'Refund',
                     'Cancelled' => 'Cancelled',
                 ],
                 'placeholder' => 'Select status',

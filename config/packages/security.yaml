@@ -11,14 +11,36 @@ security:
             entity:
                 class: App\Entity\User
                 property: username
+        api_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api_login:
+            pattern: ^/api/login
+            stateless: true
+            provider: api_user_provider
+            json_login:
+                check_path: /api/login
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: api_user_provider
+            jwt: ~
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\LoginAuthenticator
+            user_checker: App\Security\UserChecker
+            custom_authenticators:
+                - App\Security\LoginAuthenticator
+                - App\Security\GoogleAuthenticator
             remember_me:
                 secret: '%env(APP_SECRET)%'
                 lifetime: 1209600 # 2 weeks
@@ -39,9 +61,27 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/dashboard, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/connect/google, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/google/check, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/about, roles: PUBLIC_ACCESS }
+        - { path: ^/contact, roles: PUBLIC_ACCESS }
+        - { path: ^/home, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/verify/email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/services, roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify, roles: PUBLIC_ACCESS }
+        - { path: ^/api/bookings, roles: ROLE_USER }
+        - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/user, roles: ROLE_ADMIN }
         - { path: ^/activity/log, roles: ROLE_ADMIN }
+        - { path: ^/booking, roles: ROLE_USER }
+        - { path: ^/services, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/payment, roles: ROLE_USER }
+        - { path: ^/inventory, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/budget/tracker, roles: [ROLE_ADMIN, ROLE_STAFF] }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

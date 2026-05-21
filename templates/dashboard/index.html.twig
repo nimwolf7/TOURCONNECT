@@ -3,230 +3,231 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <h2 class="fw-bold text-dark mb-4">Dashboard Overview</h2>
+<div class="dashboard-shell">
+    <div class="dashboard-hero">
+        <div>
+            <p class="dashboard-eyebrow">Dashboard Overview</p>
+            <h2>Welcome back, {{ app.user ? app.user.username : 'Team' }}</h2>
+            <p class="dashboard-subtitle">Here is your operational snapshot for today. Keep an eye on bookings, payments, and inventory health.</p>
+            <div class="role-badges">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <span class="role-badge">Admin</span>
+                {% endif %}
+                {% if is_granted('ROLE_STAFF') %}
+                    <span class="role-badge">Staff</span>
+                {% endif %}
+                {% if isCustomerOnly %}
+                    <span class="role-badge">Customer</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="hero-actions">
+            {% if isCustomerOnly %}
+                <a class="hero-btn" href="{{ path('app_booking_index') }}">My Bookings</a>
+                <a class="hero-btn ghost" href="{{ path('app_payment_index') }}">My Payments</a>
+            {% else %}
+                <a class="hero-btn" href="{{ path('app_booking_index') }}">Manage Bookings</a>
+                <a class="hero-btn ghost" href="{{ path('app_service_index') }}">View Services</a>
+                <a class="hero-btn ghost" href="{{ path('app_payment_index') }}">Payments</a>
+            {% endif %}
+            {% if is_granted('ROLE_ADMIN') and not isCustomerOnly %}
+                <a class="hero-btn ghost" href="{{ path('app_user_index') }}">Users</a>
+            {% endif %}
+        </div>
+    </div>
 
-    <!-- Summary Metrics -->
-    <div class="row g-3 justify-content-center">
-        <!-- Total Users -->
-        <div class="col-md-4 col-lg-2 col-6">
-            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
-                <small class="fw-semibold text-secondary">Total Users</small>
-                <h5 class="fw-bold text-primary mb-1">{{ totalUsers|default(0) }}</h5>
+    <div class="metric-grid">
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="metric-card">
+                <div class="metric-label">Total Users</div>
+                <div class="metric-value">{{ totalUsers|default(0) }}</div>
                 <canvas id="usersSparkline" height="40"></canvas>
             </div>
+        {% endif %}
+        <div class="metric-card">
+            <div class="metric-label">Total Services</div>
+            <div class="metric-value">{{ totalServices|default(0) }}</div>
+            <canvas id="servicesSparkline" height="40"></canvas>
         </div>
-
-        <!-- Total Services -->
-        <div class="col-md-4 col-lg-2 col-6">
-            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
-                <small class="fw-semibold text-secondary">Total Services</small>
-                <h5 class="fw-bold text-primary mb-1">{{ totalServices|default(0) }}</h5>
-                <canvas id="servicesSparkline" height="40"></canvas>
-            </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Bookings</div>
+            <div class="metric-value">{{ totalBookings|default(0) }}</div>
+            <canvas id="bookingsSparkline" height="40"></canvas>
         </div>
-
-        <!-- Total Bookings -->
-        <div class="col-md-4 col-lg-2 col-6">
-            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
-                <small class="fw-semibold text-secondary">Total Bookings</small>
-                <h5 class="fw-bold text-primary mb-1">{{ totalBookings|default(0) }}</h5>
-                <canvas id="bookingsSparkline" height="40"></canvas>
-            </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Inventory</div>
+            <div class="metric-value">{{ totalInventory|default(0) }}</div>
+            <canvas id="inventorySparkline" height="40"></canvas>
         </div>
-
-        <!-- Total Inventory -->
-        <div class="col-md-4 col-lg-2 col-6">
-            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
-                <small class="fw-semibold text-secondary">Total Inventory</small>
-                <h5 class="fw-bold text-primary mb-1">{{ totalInventory|default(0) }}</h5>
-                <canvas id="inventorySparkline" height="40"></canvas>
-            </div>
-        </div>
-
-        <!-- Total Revenue -->
-        <div class="col-md-6 col-lg-3 col-12">
-            <div class="card text-center shadow-sm border-0 h-100 p-2 dashboard-card">
-                <small class="fw-semibold text-secondary">Total Revenue</small>
-                <h5 class="fw-bold text-success mb-1">
-                    ₱{{ totalRevenue|default(0)|number_format(2, '.', ',') }}
-                </h5>
-                <canvas id="revenueSparkline" height="40"></canvas>
-            </div>
+        <div class="metric-card highlight">
+            <div class="metric-label">Total Revenue</div>
+            <div class="metric-value success">PHP {{ totalRevenue|default(0)|number_format(2, '.', ',') }}</div>
+            <canvas id="revenueSparkline" height="40"></canvas>
         </div>
     </div>
 
-    <!-- Booking Statistics -->
-    <div class="row g-2 mt-2">
-        <div class="col-md-4">
-            <div class="card text-center shadow-sm border-0 py-2 px-1 dashboard-card">
-                <small class="text-warning mb-0"><i class="fas fa-clock"></i> Pending</small>
-                <h6 class="fw-bold text-warning mb-0">{{ pendingBookings|default(0) }}</h6>
-            </div>
+    <div class="status-grid">
+        <div class="status-card warning">
+            <span>Pending Bookings</span>
+            <strong>{{ pendingBookings|default(0) }}</strong>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center shadow-sm border-0 py-2 px-1 dashboard-card">
-                <small class="text-success mb-0"><i class="fas fa-check-circle"></i> Confirmed</small>
-                <h6 class="fw-bold text-success mb-0">{{ confirmedBookings|default(0) }}</h6>
-            </div>
+        <div class="status-card success">
+            <span>Complete Bookings</span>
+            <strong>{{ confirmedBookings|default(0) }}</strong>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center shadow-sm border-0 py-2 px-1 dashboard-card">
-                <small class="text-danger mb-0"><i class="fas fa-times-circle"></i> Cancelled</small>
-                <h6 class="fw-bold text-danger mb-0">{{ cancelledBookings|default(0) }}</h6>
-            </div>
+        <div class="status-card danger">
+            <span>Cancelled Bookings</span>
+            <strong>{{ cancelledBookings|default(0) }}</strong>
+        </div>
+        <div class="status-card" style="color:#6b21a8;background:#f5f3ff;">
+            <span>Refunded Bookings</span>
+            <strong>{{ refundedBookings|default(0) }}</strong>
         </div>
     </div>
 
-    <!-- Recent Activity & Top Services -->
-    <div class="row g-4 mt-3">
-        <!-- Recent Bookings -->
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 dashboard-card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Recent Bookings</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for booking in recentBookings %}
-                                <tr>
-                                    <td class="fw-bold">₱{{ booking.totalAmount|number_format(2) }}</td>
-                                    <td>{{ booking.bookingDate|date('M d, Y') }}</td>
-                                    <td>
-                                        {% if booking.status|lower == 'confirmed' %}
-                                            <span class="badge bg-success">{{ booking.status }}</span>
-                                        {% elseif booking.status|lower == 'pending' %}
-                                            <span class="badge bg-warning">{{ booking.status }}</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">{{ booking.status }}</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
+    <div class="data-grid">
+        <div class="data-card">
+            <div class="data-card-header">
+                <h5><i class="fas fa-calendar-check"></i> Recent Bookings</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in recentBookings %}
+                        <tr>
+                            <td class="fw-bold">PHP {{ booking.totalAmount|number_format(2) }}</td>
+                            <td>{{ booking.bookingDate|date('M d, Y') }}</td>
+                            <td>
+                                {% if booking.status|lower == 'complete' %}
+                                    <span class="badge bg-success">{{ booking.status }}</span>
+                                {% elseif booking.status|lower == 'pending' %}
+                                    <span class="badge bg-warning">{{ booking.status }}</span>
+                                {% elseif booking.status|lower == 'refund' %}
+                                    <span class="badge bg-info text-dark">{{ booking.status }}</span>
                                 {% else %}
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">No bookings yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                    <span class="badge bg-danger">{{ booking.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No bookings yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Recent Payments -->
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 dashboard-card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Recent Payments</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for payment in recentPayments %}
-                                <tr>
-                                    <td class="fw-bold">₱{{ payment.amount|number_format(2) }}</td>
-                                    <td>{{ payment.paymentDate|date('M d, Y') }}</td>
-                                    <td>
-                                        {% if payment.paymentStatus == 'Confirmed' %}
-                                            <span class="badge bg-success">{{ payment.paymentStatus }}</span>
-                                        {% else %}
-                                            <span class="badge bg-warning">{{ payment.paymentStatus }}</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
+        <div class="data-card">
+            <div class="data-card-header success">
+                <h5><i class="fas fa-money-bill-wave"></i> Recent Payments</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in recentPayments %}
+                        <tr>
+                            <td class="fw-bold">PHP {{ payment.amount|number_format(2) }}</td>
+                            <td>{{ payment.paymentDate|date('M d, Y') }}</td>
+                            <td>
+                                {% if payment.paymentStatus == 'Confirmed' %}
+                                    <span class="badge bg-success">{{ payment.paymentStatus }}</span>
                                 {% else %}
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">No payments yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    <span class="badge bg-warning">{{ payment.paymentStatus }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No payments yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-grid mb-5">
+        {% if not isCustomerOnly %}
+        <div class="data-card">
+            <div class="data-card-header teal">
+                <h5><i class="fas fa-star"></i> Top Services</h5>
+            </div>
+            <div class="data-card-body">
+                {% if topServices|length > 0 %}
+                    {% for service in topServices %}
+                    <div class="list-row">
+                        <div>
+                            <strong>{{ service.title|slice(0, 35) }}</strong>
+                            <br>
+                            <small class="text-muted">PHP {{ service.price|number_format(2) }}</small>
+                        </div>
+                        <span class="badge bg-success">{{ service.slots }} available</span>
                     </div>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted">No services available</p>
+                {% endif %}
             </div>
         </div>
-    </div>
+        {% endif %}
 
-    <!-- Top Services & Recent Activity -->
-    <div class="row g-4 mt-3 mb-5">
-        <!-- Top Services -->
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 dashboard-card">
-                <div class="card-header" style="background: linear-gradient(135deg, #0E4A52, #13616C); color: white;">
-                    <h5 class="mb-0"><i class="fas fa-star"></i> Top Services</h5>
-                </div>
-                <div class="card-body">
-                    {% if topServices|length > 0 %}
-                        {% for service in topServices %}
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                            <div>
-                                <strong>{{ service.title|slice(0, 35) }}</strong>
-                                <br>
-                                <small class="text-muted">₱{{ service.price|number_format(2) }}</small>
-                            </div>
-                            <span class="badge bg-success">{{ service.stock }} available</span>
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="data-card">
+            <div class="data-card-header teal">
+                <h5><i class="fas fa-history"></i> Recent Activity</h5>
+            </div>
+            <div class="data-card-body scroll">
+                {% if recentActivities|length > 0 %}
+                    {% for activity in recentActivities %}
+                    <div class="activity-row">
+                        <div class="activity-dot"></div>
+                        <div>
+                            <strong>
+                                {% if activity.user %}
+                                    {{ activity.user.username }}
+                                {% else %}
+                                    System
+                                {% endif %}
+                            </strong>
+                            <span class="text-muted">{{ activity.action }}</span>
+                            <br>
+                            <small class="text-muted">{{ activity.timestamp|date('M d, Y H:i') }}</small>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-center text-muted">No services available</p>
-                    {% endif %}
-                </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted">No recent activity</p>
+                {% endif %}
             </div>
         </div>
-
-        <!-- Recent Activity -->
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 dashboard-card">
-                <div class="card-header" style="background: linear-gradient(135deg, #0E4A52, #13616C); color: white;">
-                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activity</h5>
-                </div>
-                <div class="card-body" style="max-height: 350px; overflow-y: auto;">
-                    {% if recentActivities|length > 0 %}
-                        {% for activity in recentActivities %}
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="me-3">
-                                <i class="fas fa-circle text-primary" style="font-size: 8px;"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <strong>{{ activity.user.username }}</strong>
-                                <span class="text-muted">{{ activity.action }}</span>
-                                <br>
-                                <small class="text-muted">{{ activity.timestamp|date('M d, Y H:i') }}</small>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-center text-muted">No recent activity</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% endif %}
     </div>
-
 </div>
 
 <!-- Chart.js for Sparklines -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 function createSparkline(ctx, data, color) {
+    if (!ctx) {
+        return null;
+    }
     return new Chart(ctx, {
         type: 'line',
         data: {
@@ -257,22 +258,235 @@ createSparkline(document.getElementById('revenueSparkline'), {{ revenueSparkline
 </script>
 
 <style>
-.dashboard-card {
-    min-height: 80px;
-    border-radius: 0.8rem;
-    transition: all 0.3s ease;
-    background-color: #F5F1E6;
-}
-
-.dashboard-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
-    .dashboard-card {
-        min-height: 70px;
+    .dashboard-shell {
+        max-width: 1200px;
+        margin: 32px auto 0;
+        padding: 0 20px 20px;
     }
-}
+
+    .dashboard-hero {
+        background: linear-gradient(120deg, #0e4a52, #1b6a74);
+        color: #fff;
+        border-radius: 20px;
+        padding: 28px 30px;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+        box-shadow: 0 20px 40px rgba(14, 74, 82, 0.2);
+    }
+
+    .dashboard-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 12px;
+        margin-bottom: 8px;
+        opacity: 0.85;
+    }
+
+    .dashboard-hero h2 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-subtitle {
+        max-width: 520px;
+        opacity: 0.9;
+        margin-bottom: 16px;
+    }
+
+    .role-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .role-badge {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #fff;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .hero-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: #fff;
+        color: #0e4a52;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+    }
+
+    .hero-btn.ghost {
+        background: transparent;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .hero-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin-top: 22px;
+    }
+
+    .metric-card {
+        background: #f5f1e6;
+        border-radius: 18px;
+        padding: 18px;
+        border: 1px solid rgba(14, 74, 82, 0.08);
+        box-shadow: 0 12px 24px rgba(14, 74, 82, 0.08);
+    }
+
+    .metric-card.highlight {
+        background: #ffffff;
+    }
+
+    .metric-label {
+        font-size: 13px;
+        color: rgba(18, 54, 64, 0.7);
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .metric-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #123640;
+        margin-bottom: 6px;
+    }
+
+    .metric-value.success {
+        color: #0f766e;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .status-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 14px 16px;
+        border: 1px solid rgba(14, 74, 82, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .status-card.warning {
+        color: #b45309;
+        background: #fffbeb;
+    }
+
+    .status-card.success {
+        color: #0f766e;
+        background: #ecfeff;
+    }
+
+    .status-card.danger {
+        color: #b91c1c;
+        background: #fef2f2;
+    }
+
+    .data-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+        margin-top: 24px;
+    }
+
+    .data-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid rgba(14, 74, 82, 0.08);
+        box-shadow: 0 12px 24px rgba(14, 74, 82, 0.08);
+        overflow: hidden;
+    }
+
+    .data-card-header {
+        padding: 14px 18px;
+        background: #0e4a52;
+        color: #fff;
+    }
+
+    .data-card-header.success {
+        background: #0f766e;
+    }
+
+    .data-card-header.teal {
+        background: linear-gradient(135deg, #0e4a52, #13616c);
+    }
+
+    .data-card-body {
+        padding: 18px;
+    }
+
+    .data-card-body.scroll {
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+    .list-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .activity-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .activity-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #0e4a52;
+        margin-top: 7px;
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-actions {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-shell {
+            margin-top: 16px;
+        }
+    }
 </style>
 {% endblock %}

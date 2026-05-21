@@ -2,11 +2,13 @@
 
 namespace App\Security;
 
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -21,18 +23,35 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private UserRepository $userRepository
+    )
     {
     }
 
     public function authenticate(Request $request): Passport
     {
-        $username = $request->request->get('username');
+        $email = $request->request->get('email');
 
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
-            new UserBadge($username),
+            new UserBadge($email, function (string $userIdentifier) {
+                $user = $this->userRepository->findOneBy(['email' => $userIdentifier]);
+                if ($user) {
+                    if (!$user->isVerified()) {
+                        throw new CustomUserMessageAccountStatusException('Please verify your email before signing in.');
+                    }
+                    return $user;
+                }
+
+                $user = $this->userRepository->findOneBy(['username' => $userIdentifier]);
+                if ($user && !$user->isVerified()) {
+                    throw new CustomUserMessageAccountStatusException('Please verify your email before signing in.');
+                }
+                return $user;
+            }),
             new PasswordCredentials($request->request->get('password')),
             [
                 new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
@@ -42,22 +61,13 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $request->getSession()->getFlashBag()->add('expand_sidebar_once', '1');
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        $user = $token->getUser();
-        $response = null;
-        if (method_exists($user, 'getRoles')) {
-            $roles = $user->getRoles();
-            if (in_array('ROLE_ADMIN', $roles, true) || in_array('ROLE_STAFF', $roles, true)) {
-                $response = new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
-            }
-        }
-        if (!$response) {
-            $response = new RedirectResponse($this->urlGenerator->generate('app_login'));
-        }
-        return $response;
+        return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
     }
 
     protected function getLoginUrl(Request $request): string

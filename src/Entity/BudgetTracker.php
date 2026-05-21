@@ -18,6 +18,10 @@ class BudgetTracker
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Booking $booking = null;
+
     #[ORM\Column(length: 255)]
     private ?string $category = null;
 
@@ -91,7 +95,18 @@ class BudgetTracker
     public function setDateRange(string $dateRange): static
     {
         $this->dateRange = $dateRange;
-        
+
+        return $this;
+    }
+
+    public function getBooking(): ?Booking
+    {
+        return $this->booking;
+    }
+
+    public function setBooking(?Booking $booking): static
+    {
+        $this->booking = $booking;
 
         return $this;
     }

@@ -17,10 +17,30 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ActivityLogController extends AbstractController
 {
     #[Route(name: 'app_activity_log_index', methods: ['GET'])]
-    public function index(ActivityLogRepository $activityLogRepository): Response
+    public function index(Request $request, ActivityLogRepository $activityLogRepository): Response
     {
+        $filter = (string) $request->query->get('filter', 'all');
+        $range = (string) $request->query->get('range', 'all');
+
+        $keywords = match ($filter) {
+            'auth' => ['Login', 'Logout'],
+            'customer_auth' => ['Customer Login', 'Customer Logout'],
+            default => [],
+        };
+
+        $fromDate = match ($range) {
+            'today' => new \DateTime('today'),
+            '7d' => new \DateTime('-7 days'),
+            '30d' => new \DateTime('-30 days'),
+            default => null,
+        };
+
+        $activityLogs = $activityLogRepository->findFiltered($keywords, $fromDate);
+
         return $this->render('activity_log/index.html.twig', [
-            'activity_logs' => $activityLogRepository->findAllOrdered(),
+            'activity_logs' => $activityLogs,
+            'selected_filter' => $filter,
+            'selected_range' => $range,
         ]);
     }
 

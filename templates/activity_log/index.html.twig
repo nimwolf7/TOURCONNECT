@@ -166,65 +166,133 @@
         color: white;
         box-shadow: 0 2px 8px rgba(23,162,184,0.3);
     }
+
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(14,74,82,0.2);
+        color: #0E4A52;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+
+    .filter-tab:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(14,74,82,0.14);
+    }
+
+    .filter-tab.active {
+        background: linear-gradient(135deg, #13616C, #0E4A52);
+        color: #fff;
+        border-color: transparent;
+    }
+
+    .range-label {
+        margin: 6px 0 10px;
+        color: #0E4A52;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
 </style>
 
-<div class="page-card">
-    <div class="page-header">
-        <h3>
-            <i class="fas fa-history"></i>
-            Activity Logs
-        </h3>
-        <a href="{{ path('app_activity_log_new') }}" class="create-btn">
-            <i class="fas fa-plus"></i>
-            Create New
-        </a>
-    </div>
+<div class="admin-page">
+    <div class="page-card">
+        <div class="page-header">
+            <h3>
+                <i class="fas fa-history"></i>
+                Activity Logs
+            </h3>
+            <a href="{{ path('app_activity_log_new') }}" class="create-btn">
+                <i class="fas fa-plus"></i>
+                Create New
+            </a>
+        </div>
 
-    <div class="page-body">
-        {% if activity_logs|length > 0 %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Action</th>
-                        <th>Timestamp</th>
-                        <th>IP Address</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for activity_log in activity_logs %}
-                    <tr>
-                        <td><strong>#{{ activity_log.id }}</strong></td>
-                        <td>
-                            <i class="fas fa-user"></i>
-                            {{ activity_log.user ? activity_log.user.username : 'System' }}
-                        </td>
-                        <td>
-                            <span class="action-badge">{{ activity_log.action }}</span>
-                        </td>
-                        <td>{{ activity_log.timestamp ? activity_log.timestamp|date('M d, Y H:i:s') : '-' }}</td>
-                        <td><code>{{ activity_log.ipAddress }}</code></td>
-                        <td>
-                            <a href="{{ path('app_activity_log_show', {'id': activity_log.id}) }}" class="action-btn action-btn-view">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                            <a href="{{ path('app_activity_log_edit', {'id': activity_log.id}) }}" class="action-btn action-btn-edit">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="empty-state">
-                <i class="fas fa-folder-open"></i>
-                <h4>No Audit Logs Found</h4>
-                <p>Start by creating a new audit log entry</p>
+        <div class="page-body">
+            <div class="filter-tabs">
+                <a href="{{ path('app_activity_log_index', {'filter': 'all', 'range': selected_range|default('all')}) }}" class="filter-tab {{ selected_filter == 'all' ? 'active' : '' }}">
+                    All Activity
+                </a>
+                <a href="{{ path('app_activity_log_index', {'filter': 'auth', 'range': selected_range|default('all')}) }}" class="filter-tab {{ selected_filter == 'auth' ? 'active' : '' }}">
+                    Login/Logout
+                </a>
+                <a href="{{ path('app_activity_log_index', {'filter': 'customer_auth', 'range': selected_range|default('all')}) }}" class="filter-tab {{ selected_filter == 'customer_auth' ? 'active' : '' }}">
+                    Customer Login Activity
+                </a>
             </div>
-        {% endif %}
+            <div class="range-label">Date Range</div>
+            <div class="filter-tabs">
+                <a href="{{ path('app_activity_log_index', {'filter': selected_filter|default('all'), 'range': 'all'}) }}" class="filter-tab {{ selected_range|default('all') == 'all' ? 'active' : '' }}">
+                    All Time
+                </a>
+                <a href="{{ path('app_activity_log_index', {'filter': selected_filter|default('all'), 'range': 'today'}) }}" class="filter-tab {{ selected_range|default('all') == 'today' ? 'active' : '' }}">
+                    Today
+                </a>
+                <a href="{{ path('app_activity_log_index', {'filter': selected_filter|default('all'), 'range': '7d'}) }}" class="filter-tab {{ selected_range|default('all') == '7d' ? 'active' : '' }}">
+                    Last 7 Days
+                </a>
+                <a href="{{ path('app_activity_log_index', {'filter': selected_filter|default('all'), 'range': '30d'}) }}" class="filter-tab {{ selected_range|default('all') == '30d' ? 'active' : '' }}">
+                    Last 30 Days
+                </a>
+            </div>
+
+            {% if activity_logs|length > 0 %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Timestamp</th>
+                            <th>IP Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for activity_log in activity_logs %}
+                        <tr>
+                            <td><strong>#{{ activity_log.id }}</strong></td>
+                            <td>
+                                <i class="fas fa-user"></i>
+                                {{ activity_log.user ? activity_log.user.username : 'System' }}
+                            </td>
+                            <td>
+                                <span class="action-badge">{{ activity_log.action }}</span>
+                            </td>
+                            <td>{{ activity_log.timestamp ? activity_log.timestamp|date('M d, Y H:i:s') : '-' }}</td>
+                            <td><code>{{ activity_log.ipAddress }}</code></td>
+                            <td>
+                                <a href="{{ path('app_activity_log_show', {'id': activity_log.id}) }}" class="action-btn action-btn-view">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{{ path('app_activity_log_edit', {'id': activity_log.id}) }}" class="action-btn action-btn-edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <h4>No Audit Logs Found</h4>
+                    <p>Start by creating a new audit log entry</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

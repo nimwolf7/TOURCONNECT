@@ -16,5 +16,25 @@ services:
     App\:
         resource: '../src/'
 
+    App\Service\EmailVerificationService:
+        arguments:
+            $mailerFrom: '%env(MAILER_FROM)%'
+
+    App\Service\PayMongoService:
+        arguments:
+            $payMongoSecretKey: '%env(PAYMONGO_SECRET_KEY)%'
+            $successUrl: '%env(PAYMONGO_SUCCESS_URL)%'
+            $cancelUrl: '%env(PAYMONGO_CANCEL_URL)%'
+
+    # Use a non-cURL handler for OAuth to avoid cURL runtime issues.
+    app.oauth_stream_handler:
+        class: GuzzleHttp\Handler\StreamHandler
+
+    app.oauth_guzzle_client:
+        class: GuzzleHttp\Client
+        arguments:
+            $config:
+                handler: '@app.oauth_stream_handler'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

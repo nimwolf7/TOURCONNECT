@@ -187,74 +187,84 @@
     }
 </style>
 
-<div class="container mt-4">
-    <div class="list-card">
-        <div class="list-header">
-            <h3>
-                <i class="fa-solid fa-wallet"></i>
-                Budget Tracker
-            </h3>
-            <a href="{{ path('app_budget_tracker_new') }}" class="add-btn-header">
-                <i class="fa-solid fa-plus"></i>
-                Add New
-            </a>
-        </div>
+<div class="admin-page">
+    <div class="container mt-4">
+        <div class="list-card">
+            <div class="list-header">
+                <h3>
+                    <i class="fa-solid fa-wallet"></i>
+                    Budget Tracker
+                </h3>
+                <a href="{{ path('app_budget_tracker_new') }}" class="add-btn-header">
+                    <i class="fa-solid fa-plus"></i>
+                    Add New
+                </a>
+            </div>
 
-        <div class="list-body">
-            {% if budget_trackers is not empty %}
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User</th>
-                                <th>Category</th>
-                                <th>Planned (₱)</th>
-                                <th>Spent (₱)</th>
-                                <th>Date Range</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for budget_tracker in budget_trackers %}
+            <div class="list-body">
+                {% if budget_trackers is not empty %}
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <td><span class="budget-id">{{ budget_tracker.id }}</span></td>
-                                    <td>{{ budget_tracker.user.username }}</td>
-                                    <td class="category-cell">{{ budget_tracker.category }}</td>
-                                    <td><span class="amount-planned">{{ budget_tracker.amountPlanned|number_format(2) }}</span></td>
-                                    <td><span class="amount-spent">{{ budget_tracker.amountSpent|number_format(2) }}</span></td>
-                                    <td>{{ budget_tracker.dateRange }}</td>
-                                    <td>
-                                        <a href="{{ path('app_budget_tracker_show', {'id': budget_tracker.id}) }}" 
-                                           class="action-btn btn-view me-1" title="View Details">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </a>
-
-                                        <a href="{{ path('app_budget_tracker_edit', {'id': budget_tracker.id}) }}" 
-                                           class="action-btn btn-edit me-1" title="Edit Entry">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-
-                                        <form method="post" action="{{ path('app_budget_tracker_delete', {'id': budget_tracker.id}) }}" 
-                                              style="display:inline-block;" 
-                                              onsubmit="return confirm('Are you sure you want to delete this entry?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ budget_tracker.id) }}">
-                                            <button class="action-btn btn-delete" title="Delete Entry">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Booking</th>
+                                    <th>User</th>
+                                    <th>Category</th>
+                                    <th>Planned (₱)</th>
+                                    <th>Spent (₱)</th>
+                                    <th>Date Range</th>
+                                    <th>Actions</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <i class="fa-solid fa-inbox"></i>
-                    <p>No budget tracker entries found.</p>
-                </div>
-            {% endif %}
+                            </thead>
+                            <tbody>
+                                {% for budget_tracker in budget_trackers %}
+                                    <tr>
+                                        <td><span class="budget-id">{{ budget_tracker.id }}</span></td>
+                                        <td>
+                                            {% if budget_tracker.booking %}
+                                                #{{ budget_tracker.booking.id }}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ budget_tracker.user.username }}</td>
+                                        <td class="category-cell">{{ budget_tracker.category }}</td>
+                                        <td><span class="amount-planned">{{ budget_tracker.amountPlanned|number_format(2) }}</span></td>
+                                        <td><span class="amount-spent">{{ budget_tracker.amountSpent|number_format(2) }}</span></td>
+                                        <td>{{ budget_tracker.dateRange }}</td>
+                                        <td>
+                                            <a href="{{ path('app_budget_tracker_show', {'id': budget_tracker.id}) }}" 
+                                               class="action-btn btn-view me-1" title="View Details">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+
+                                            <a href="{{ path('app_budget_tracker_edit', {'id': budget_tracker.id}) }}" 
+                                               class="action-btn btn-edit me-1" title="Edit Entry">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+
+                                            <form method="post" action="{{ path('app_budget_tracker_delete', {'id': budget_tracker.id}) }}" 
+                                                  style="display:inline-block;" 
+                                                  onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ budget_tracker.id) }}">
+                                                <button class="action-btn btn-delete" title="Delete Entry">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>No budget tracker entries found.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

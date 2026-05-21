@@ -5,22 +5,14 @@
     </h4>
 
     <div class="row g-3">
-        {# Render service field with data-price attributes for JS auto-calc #}
         <div class="col-md-6">
             <div class="form-group">
                 {{ form_label(form.service, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
-                <select name="{{ form.service.vars.full_name }}" class="form-control rounded-3 border-1 shadow-sm" id="booking_service">
-                    <option value="">Select a service</option>
-                    {% for choice in form.service.vars.choices %}
-                        {% set service = choice.data %}
-                        <option value="{{ choice.value }}" data-price="{{ service.price }}" {% if choice.value == form.service.vars.value %}selected{% endif %}>{{ choice.label }}</option>
-                    {% endfor %}
-                </select>
+                {{ form_widget(form.service, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
                 {{ form_errors(form.service) }}
             </div>
         </div>
 
-        {# Render quantity field #}
         <div class="col-md-6">
             <div class="form-group">
                 {{ form_label(form.quantity, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
@@ -29,14 +21,23 @@
             </div>
         </div>
 
-        {# Render status field #}
-        <div class="col-md-6">
-            <div class="form-group">
-                {{ form_label(form.status, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
-                {{ form_widget(form.status, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
-                {{ form_errors(form.status) }}
+        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.status, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
+                    {{ form_errors(form.status) }}
+                </div>
             </div>
-        </div>
+        {% else %}
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label fw-semibold text-dark">Status</label>
+                    <input type="text" class="form-control rounded-3 border-1 shadow-sm" value="Pending (set automatically)" readonly>
+                </div>
+            </div>
+            {% do form.status.setRendered() %}
+        {% endif %}
 
         {# Render booking date field #}
         <div class="col-md-6">
@@ -51,19 +52,22 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{ form_label(form.totalAmount, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
-                {{ form_widget(form.totalAmount, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
+                {{ form_widget(form.totalAmount, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm', 'readonly': 'readonly'}}) }}
                 {{ form_errors(form.totalAmount) }}
             </div>
         </div>
 
-        {# Render user field #}
-        <div class="col-md-6">
-            <div class="form-group">
-                {{ form_label(form.user, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
-                {{ form_widget(form.user, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
-                {{ form_errors(form.user) }}
+        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.user, null, {'label_attr': {'class': 'form-label fw-semibold text-dark'}}) }}
+                    {{ form_widget(form.user, {'attr': {'class': 'form-control rounded-3 border-1 shadow-sm'}}) }}
+                    {{ form_errors(form.user) }}
+                </div>
             </div>
-        </div>
+        {% else %}
+            {% do form.user.setRendered() %}
+        {% endif %}
     </div>
 
     {% set buttonColor = isEdit ? '#EAB308' : '#0E4A52' %}
@@ -76,39 +80,27 @@
         </button>
     </div>
 
-    {# This tells Symfony that service field is rendered, preventing duplicate #}
-    {% do form.service.setRendered() %}
-
 {{ form_end(form) }}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const serviceSelect = document.querySelector('[name$="[service]"]');
-    const quantityInput = document.querySelector('[name$="[quantity]"]');
-    const totalAmountInput = document.querySelector('[name$="[totalAmount]"]');
-    let servicePrices = {};
+    const serviceSelect = document.getElementById('{{ form.service.vars.id }}');
+    const quantityInput = document.getElementById('{{ form.quantity.vars.id }}');
+    const totalAmountInput = document.getElementById('{{ form.totalAmount.vars.id }}');
 
-    // Build a map of service id to price from the select options (if data-price attribute is available)
-    if (serviceSelect) {
-        Array.from(serviceSelect.options).forEach(opt => {
-            if (opt.value && opt.dataset.price) {
-                servicePrices[opt.value] = parseFloat(opt.dataset.price);
-            }
-        });
+    if (!serviceSelect || !quantityInput || !totalAmountInput) {
+        return;
     }
 
     function updateTotal() {
-        const serviceId = serviceSelect ? serviceSelect.value : null;
-        const quantity = quantityInput ? parseInt(quantityInput.value) : 0;
-        const price = servicePrices[serviceId] || 0;
-        if (totalAmountInput) {
-            totalAmountInput.value = (quantity > 0 ? (price * quantity).toFixed(2) : '');
-        }
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const price = selectedOption ? parseFloat(selectedOption.dataset.price || '0') : 0;
+        const quantity = parseInt(quantityInput.value || '0', 10);
+        totalAmountInput.value = quantity > 0 && price > 0 ? (price * quantity).toFixed(2) : '';
     }
 
-    if (serviceSelect && quantityInput) {
-        serviceSelect.addEventListener('change', updateTotal);
-        quantityInput.addEventListener('input', updateTotal);
-    }
+    serviceSelect.addEventListener('change', updateTotal);
+    quantityInput.addEventListener('input', updateTotal);
+    updateTotal();
 });
 </script>

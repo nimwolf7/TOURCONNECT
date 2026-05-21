@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\ActivityLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * @extends ServiceEntityRepository<ActivityLog>
@@ -26,6 +27,53 @@ class ActivityLogRepository extends ServiceEntityRepository
             ->orderBy('a.timestamp', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return ActivityLog[]
+     */
+    public function findByActionKeywords(array $keywords): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->orderBy('a.timestamp', 'DESC');
+
+        if ($keywords === []) {
+            return $qb->getQuery()->getResult();
+        }
+
+        foreach (array_values($keywords) as $index => $keyword) {
+            $param = 'keyword_' . $index;
+            $qb->orWhere("a.action LIKE :$param")
+                ->setParameter($param, '%' . $keyword . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return ActivityLog[]
+     */
+    public function findFiltered(array $keywords, ?\DateTimeInterface $fromDate): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->orderBy('a.timestamp', 'DESC');
+
+        if ($keywords !== []) {
+            $orX = $qb->expr()->orX();
+            foreach (array_values($keywords) as $index => $keyword) {
+                $param = 'keyword_' . $index;
+                $orX->add("a.action LIKE :$param");
+                $qb->setParameter($param, '%' . $keyword . '%');
+            }
+            $qb->andWhere($orX);
+        }
+
+        if ($fromDate !== null) {
+            $qb->andWhere('a.timestamp >= :fromDate')
+                ->setParameter('fromDate', $fromDate, Types::DATETIME_MUTABLE);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     //    /**

@@ -1,3 +1,4 @@
+{% set forceExpandSidebar = app.user and app.flashes('expand_sidebar_once') is not empty %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -23,32 +24,34 @@
                     position: fixed;
                     left: 0;
                     top: 0;
-                    width: 260px;
+                    width: 270px;
                     height: 100vh;
-                    background: linear-gradient(180deg, #0E4A52 0%, #1b3a4b 100%);
-                    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+                    background: linear-gradient(180deg, #0e4a52 0%, #103c45 55%, #0d2e35 100%);
+                    box-shadow: 6px 0 24px rgba(13, 46, 53, 0.25);
                     z-index: 1000;
                     overflow-y: auto;
                     transition: all 0.3s ease;
                 }
                 
                 .sidebar-header {
-                    padding: 25px 20px;
-                    background: rgba(0,0,0,0.2);
-                    border-bottom: 2px solid rgba(255,255,255,0.1);
+                    padding: 26px 22px;
+                    background: rgba(255, 255, 255, 0.06);
+                    border-bottom: 1px solid rgba(255,255,255,0.12);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    min-height: 95px;
+                    min-height: 96px;
                 }
                 
                 .sidebar-header img {
-                    width: 150px;
-                    max-width: 150px;
+                    width: 148px;
+                    max-width: 148px;
                     height: auto;
-                    max-height: 70px;
-                    border-radius: 8px;
+                    max-height: 72px;
+                    border-radius: 12px;
                     object-fit: contain;
+                    padding: 6px 8px;
+                    background: rgba(255, 255, 255, 0.85);
                 }
                 
                 .sidebar-header h4 {
@@ -60,58 +63,61 @@
                 }
                 
                 .nav-menu {
-                    padding: 20px 0;
+                    padding: 18px 0 24px;
                     list-style: none;
                 }
                 
                 .nav-item {
-                    margin: 5px 15px;
+                    margin: 6px 16px;
                 }
                 
                 .nav-link {
                     display: flex;
                     align-items: center;
-                    padding: 14px 18px;
-                    color: rgba(255,255,255,0.85);
+                    padding: 12px 16px;
+                    color: rgba(255,255,255,0.82);
                     text-decoration: none;
-                    border-radius: 10px;
-                    transition: all 0.3s ease;
+                    border-radius: 12px;
+                    transition: all 0.25s ease;
                     font-size: 15px;
                     font-weight: 500;
                     gap: 12px;
+                    border: 1px solid transparent;
                 }
                 
                 .nav-link i {
                     width: 22px;
-                    font-size: 18px;
+                    font-size: 17px;
                     text-align: center;
                 }
                 
                 .nav-link:hover {
-                    background: rgba(255,255,255,0.15);
-                    color: white;
-                    transform: translateX(5px);
+                    background: rgba(255,255,255,0.14);
+                    color: #ffffff;
+                    transform: translateX(4px);
+                    border-color: rgba(255,255,255,0.2);
                 }
                 
                 .nav-link.active {
-                    background: rgba(255,255,255,0.2);
-                    color: white;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    background: rgba(255,255,255,0.22);
+                    color: #ffffff;
+                    border-color: rgba(255,255,255,0.3);
+                    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
                 }
                 
                 .nav-section-title {
-                    color: rgba(255,255,255,0.5);
-                    font-size: 12px;
+                    color: rgba(255,255,255,0.6);
+                    font-size: 11px;
                     font-weight: 600;
                     text-transform: uppercase;
-                    letter-spacing: 1px;
-                    padding: 20px 20px 10px;
-                    margin-top: 10px;
+                    letter-spacing: 2px;
+                    padding: 18px 22px 8px;
+                    margin-top: 14px;
                 }
                 
                 /* Main Content Area */
                 .main-wrapper {
-                    margin-left: 260px;
+                    margin-left: 270px;
                     min-height: 100vh;
                     display: flex;
                     flex-direction: column;
@@ -179,6 +185,30 @@
                 
                 .user-menu .logout-btn:hover {
                     background: #c82333;
+                }
+
+                .role-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 4px 10px;
+                    border-radius: 999px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.6px;
+                    margin-left: 8px;
+                }
+
+                .role-pill.admin {
+                    background: rgba(14, 74, 82, 0.15);
+                    color: #0E4A52;
+                    border: 1px solid rgba(14, 74, 82, 0.35);
+                }
+
+                .role-pill.staff {
+                    background: rgba(37, 99, 235, 0.15);
+                    color: #1d4ed8;
+                    border: 1px solid rgba(37, 99, 235, 0.35);
                 }
                 
                 /* Flash Messages */
@@ -251,6 +281,170 @@
                     padding: 30px;
                     background: #f5f7fa;
                 }
+
+                /* Admin content theme */
+                .admin-page {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .admin-page .page-card,
+                .admin-page .list-card,
+                .admin-page .details-card,
+                .admin-page .form-card,
+                .admin-page .detail-card {
+                    background: #ffffff !important;
+                    border-radius: 18px !important;
+                    box-shadow: 0 12px 30px rgba(14, 74, 82, 0.12) !important;
+                    border: 1px solid rgba(14, 74, 82, 0.08) !important;
+                    overflow: hidden;
+                }
+
+                .admin-page .page-header,
+                .admin-page .list-header,
+                .admin-page .details-header,
+                .admin-page .form-header,
+                .admin-page .detail-header {
+                    background: linear-gradient(135deg, #0E4A52, #0B3E46) !important;
+                    color: #ffffff !important;
+                    padding: 24px 28px !important;
+                    border-bottom: 2px solid rgba(255, 255, 255, 0.18) !important;
+                }
+
+                .admin-page .page-body,
+                .admin-page .list-body,
+                .admin-page .details-body,
+                .admin-page .form-body,
+                .admin-page .detail-body {
+                    background: #f7fafb !important;
+                    padding: 28px 30px !important;
+                }
+
+                .admin-page .data-table,
+                .admin-page .info-table,
+                .admin-page .table {
+                    background: #ffffff !important;
+                    border-radius: 14px !important;
+                    overflow: hidden;
+                    box-shadow: 0 6px 18px rgba(14, 74, 82, 0.08) !important;
+                }
+
+                .admin-page .data-table thead,
+                .admin-page .table thead {
+                    background: linear-gradient(135deg, #0E4A52, #0A3940) !important;
+                    color: #ffffff !important;
+                }
+
+                .admin-page .data-table thead th,
+                .admin-page .table thead th {
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    font-size: 12px;
+                }
+
+                .admin-page .data-table tbody tr:hover,
+                .admin-page .table tbody tr:hover {
+                    background: #f0f7f8 !important;
+                }
+
+                .admin-page .form-control,
+                .admin-page .form-select,
+                .admin-page input[type="text"],
+                .admin-page input[type="password"],
+                .admin-page input[type="number"],
+                .admin-page input[type="email"],
+                .admin-page textarea,
+                .admin-page select {
+                    border-radius: 10px !important;
+                    border: 1px solid #d9e2e6 !important;
+                    background: #ffffff !important;
+                    box-shadow: none !important;
+                }
+
+                .admin-page .form-control:focus,
+                .admin-page .form-select:focus,
+                .admin-page input:focus,
+                .admin-page textarea:focus,
+                .admin-page select:focus {
+                    border-color: #0E4A52 !important;
+                    box-shadow: 0 0 0 3px rgba(14, 74, 82, 0.12) !important;
+                }
+
+                .admin-page .create-btn,
+                .admin-page .add-btn-header,
+                .admin-page .back-btn-header,
+                .admin-page .back-btn,
+                .admin-page .save-btn,
+                .admin-page .update-btn,
+                .admin-page .edit-btn,
+                .admin-page .action-btn,
+                .admin-page .btn {
+                    border-radius: 10px !important;
+                    font-weight: 600;
+                    text-decoration: none !important;
+                }
+
+                .admin-page .create-btn,
+                .admin-page .add-btn-header,
+                .admin-page .back-btn-header {
+                    background: rgba(255, 255, 255, 0.18) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+                    color: #ffffff !important;
+                }
+
+                .admin-page .create-btn:hover,
+                .admin-page .add-btn-header:hover,
+                .admin-page .back-btn-header:hover {
+                    background: rgba(255, 255, 255, 0.28) !important;
+                    transform: translateY(-1px);
+                }
+
+                .admin-page .btn-tour,
+                .admin-page .btn-primary,
+                .admin-page .update-btn,
+                .admin-page .edit-btn {
+                    background: linear-gradient(135deg, #0E4A52, #13616C) !important;
+                    color: #ffffff !important;
+                    border: none !important;
+                }
+
+                .admin-page .btn-tour-outline,
+                .admin-page .btn-secondary,
+                .admin-page .back-btn {
+                    background: #ffffff !important;
+                    color: #0E4A52 !important;
+                    border: 2px solid #0E4A52 !important;
+                }
+
+                .admin-page .btn-tour-danger,
+                .admin-page .btn-danger,
+                .admin-page .delete-btn,
+                .admin-page .action-btn-delete {
+                    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+                    color: #ffffff !important;
+                    border: none !important;
+                }
+
+                .admin-page .action-btn,
+                .admin-page .btn-view,
+                .admin-page .btn-edit {
+                    border: 1px solid rgba(14, 74, 82, 0.2) !important;
+                }
+
+                .admin-page .card,
+                .admin-page .card-body,
+                .admin-page .card-footer {
+                    background: #ffffff !important;
+                }
+
+                .admin-page .card-footer {
+                    border-top: 1px solid rgba(14, 74, 82, 0.08) !important;
+                }
+
+                .admin-page .badge {
+                    font-weight: 600;
+                    border-radius: 999px;
+                }
                 
                 /* Footer */
                 .footer {
@@ -282,12 +476,12 @@
                 
                 /* Desktop toggle - slim sidebar with icons only */
                 .sidebar.collapsed {
-                    width: 80px;
+                    width: 86px;
                 }
                 
                 .sidebar.collapsed .sidebar-header img {
-                    width: 50px;
-                    max-width: 50px;
+                    width: 56px;
+                    max-width: 56px;
                 }
                 
                 .sidebar.collapsed .nav-link span {
@@ -308,7 +502,47 @@
                 }
                 
                 .sidebar.collapsed ~ .main-wrapper {
-                    margin-left: 80px;
+                    margin-left: 86px;
+                }
+
+                /* Force state via root class (pre-render) */
+                html.sidebar-collapsed .sidebar {
+                    width: 86px;
+                }
+
+                html.sidebar-collapsed .sidebar .sidebar-header img {
+                    width: 56px;
+                    max-width: 56px;
+                }
+
+                html.sidebar-collapsed .sidebar .nav-link span {
+                    display: none;
+                }
+
+                html.sidebar-collapsed .sidebar .nav-section-title {
+                    display: none;
+                }
+
+                html.sidebar-collapsed .sidebar .nav-link {
+                    justify-content: center;
+                    padding: 14px 10px;
+                }
+
+                html.sidebar-collapsed .sidebar .nav-link i {
+                    margin: 0;
+                }
+
+                html.sidebar-collapsed .sidebar ~ .main-wrapper {
+                    margin-left: 86px;
+                }
+
+                html.sidebar-mobile-active .sidebar {
+                    transform: translateX(0);
+                }
+
+                html.sidebar-mobile-active .sidebar-backdrop {
+                    display: block;
+                    opacity: 1;
                 }
                 
                 /* Responsive */
@@ -328,9 +562,36 @@
         
         {% block javascripts %}
         {% endblock %}
+        <script>
+            (function () {
+                try {
+                    var forceExpandSidebar = {{ forceExpandSidebar ? 'true' : 'false' }};
+                    if (forceExpandSidebar) {
+                        localStorage.setItem('sidebar-collapsed', '0');
+                        sessionStorage.setItem('sidebar-collapsed', '0');
+                        localStorage.setItem('sidebar-mobile-active', '0');
+                        sessionStorage.setItem('sidebar-mobile-active', '0');
+                    }
+
+                    var collapsed = localStorage.getItem('sidebar-collapsed') || sessionStorage.getItem('sidebar-collapsed');
+                    var mobileActive = localStorage.getItem('sidebar-mobile-active') || sessionStorage.getItem('sidebar-mobile-active');
+                    if (window.innerWidth > 768 && collapsed === '1') {
+                        document.documentElement.classList.add('sidebar-collapsed');
+                    }
+                    if (window.innerWidth <= 768 && mobileActive === '1') {
+                        document.documentElement.classList.add('sidebar-mobile-active');
+                    }
+                } catch (e) {
+                    // Ignore storage errors
+                }
+            })();
+        </script>
     </head>
     <body>
-        {% if app.user %}
+        {% set currentRoute = app.request.attributes.get('_route') %}
+        {% set showSidebar = app.user and currentRoute not in ['app_landing', 'app_home', 'app_login', 'app_register', 'app_about', 'app_contact'] %}
+        {% set isCustomerOnly = app.user and not is_granted('ROLE_ADMIN') and not is_granted('ROLE_STAFF') %}
+        {% if showSidebar %}
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -346,57 +607,77 @@
                         </a>
                     </li>
                     
-                    <div class="nav-section-title">Management</div>
-                    
-                    {% if is_granted('ROLE_ADMIN') %}
-                    <li class="nav-item">
-                        <a href="{{ path('app_user_index') }}" class="nav-link">
-                            <i class="fas fa-users-cog"></i>
-                            <span>User Management</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    <li class="nav-item">
-                        <a href="{{ path('app_booking_index') }}" class="nav-link">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Bookings</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('app_service_index') }}" class="nav-link">
-                            <i class="fas fa-concierge-bell"></i>
-                            <span>Services</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('app_payment_index') }}" class="nav-link">
-                            <i class="fas fa-credit-card"></i>
-                            <span>Payments</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('app_inventory_index') }}" class="nav-link">
-                            <i class="fas fa-boxes"></i>
-                            <span>Inventory</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('app_budget_tracker_index') }}" class="nav-link">
-                            <i class="fas fa-wallet"></i>
-                            <span>Budget Tracker</span>
-                        </a>
-                    </li>
-                    
-                    {% if is_granted('ROLE_ADMIN') %}
-                    <div class="nav-section-title">Admin</div>
-                    
-                    <li class="nav-item">
-                        <a href="{{ path('app_activity_log_index') }}" class="nav-link">
-                            <i class="fas fa-history"></i>
-                            <span>Activity Logs</span>
-                        </a>
-                    </li>
+                    {% if isCustomerOnly %}
+                        <div class="nav-section-title">Customer Workspace</div>
+                        <li class="nav-item">
+                            <a href="{{ path('app_booking_index') }}" class="nav-link">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>My Bookings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_payment_index') }}" class="nav-link">
+                                <i class="fas fa-credit-card"></i>
+                                <span>My Payments</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <div class="nav-section-title">Operations</div>
+                        {% else %}
+                        <div class="nav-section-title">Staff Workspace</div>
+                        {% endif %}
+                        
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item">
+                            <a href="{{ path('app_user_index') }}" class="nav-link">
+                                <i class="fas fa-users-cog"></i>
+                                <span>User Management</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="nav-item">
+                            <a href="{{ path('app_booking_index') }}" class="nav-link">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Bookings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_service_index') }}" class="nav-link">
+                                <i class="fas fa-concierge-bell"></i>
+                                <span>Services</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_payment_index') }}" class="nav-link">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Payments</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_inventory_index') }}" class="nav-link">
+                                <i class="fas fa-boxes"></i>
+                                <span>Inventory</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_budget_tracker_index') }}" class="nav-link">
+                                <i class="fas fa-wallet"></i>
+                                <span>Budget Tracker</span>
+                            </a>
+                        </li>
+                        
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <div class="nav-section-title">Admin Tools</div>
+                        
+                        <li class="nav-item">
+                            <a href="{{ path('app_activity_log_index') }}" class="nav-link">
+                                <i class="fas fa-history"></i>
+                                <span>Activity Logs</span>
+                            </a>
+                        </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
             </nav>
@@ -407,8 +688,8 @@
         {% endif %}
 
         <!-- Main Content Wrapper -->
-        <div class="main-wrapper" {% if not app.user %}style="margin-left: 0;"{% endif %}>
-            {% if app.user %}
+        <div class="main-wrapper" {% if not showSidebar %}style="margin-left: 0;"{% endif %}>
+            {% if showSidebar %}
             <!-- Top Navbar -->
             <header class="top-navbar">
                 <div class="left-section">
@@ -420,7 +701,15 @@
                 
                 <div class="user-menu">
                     {% if app.user %}
-                        <span><i class="fas fa-user-circle"></i> {{ app.user.username }}</span>
+                        <span>
+                            <i class="fas fa-user-circle"></i>
+                            {{ app.user.username }}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <span class="role-pill admin">Admin</span>
+                            {% elseif is_granted('ROLE_STAFF') %}
+                                <span class="role-pill staff">Staff</span>
+                            {% endif %}
+                        </span>
                         <a href="{{ path('app_logout') }}" class="logout-btn">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </a>
@@ -433,26 +722,33 @@
             </header>
             {% endif %}
 
-            <!-- Flash Messages -->
-            <div class="flash-messages-container" {% if not app.user %}style="padding: 20px 30px 0;"{% endif %}>
-                {% for type, messages in app.flashes %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
-                            {% if type == 'success' %}
-                                <i class="fas fa-check-circle"></i>
-                            {% elseif type == 'danger' %}
-                                <i class="fas fa-exclamation-circle"></i>
-                            {% elseif type == 'warning' %}
-                                <i class="fas fa-exclamation-triangle"></i>
-                            {% elseif type == 'info' %}
-                                <i class="fas fa-info-circle"></i>
+            {% if app.request and app.request.attributes.get('_route') != 'app_landing' %}
+                <!-- Flash Messages -->
+                <div class="flash-messages-container" {% if not app.user %}style="padding: 20px 30px 0;"{% endif %}>
+                    {% set renderedFlashes = [] %}
+                    {% for type, messages in app.flashes %}
+                        {% for message in messages %}
+                            {% set flashKey = type ~ '|' ~ message %}
+                            {% if flashKey not in renderedFlashes %}
+                                <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                                    {% if type == 'success' %}
+                                        <i class="fas fa-check-circle"></i>
+                                    {% elseif type == 'danger' %}
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    {% elseif type == 'warning' %}
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    {% elseif type == 'info' %}
+                                        <i class="fas fa-info-circle"></i>
+                                    {% endif %}
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% set renderedFlashes = renderedFlashes|merge([flashKey]) %}
                             {% endif %}
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
-        </div>
+                </div>
+            {% endif %}
 
         <!-- Page Content -->
                 <main class="content-area">
@@ -463,7 +759,7 @@
 
         <!-- Footer -->
             <footer class="footer">
-            © 2025 Tour Connect. All rights reserved.
+            © 2026 Tour Connect. All rights reserved.
             </footer>
         </div>
 
@@ -475,6 +771,25 @@
             {{ encore_entry_script_tags('app') }}
             
             <script>
+                function saveSidebarState(sidebar) {
+                    if (!sidebar) {
+                        return;
+                    }
+
+                    const root = document.documentElement;
+                    if (window.innerWidth <= 768) {
+                        const isActive = sidebar.classList.contains('active');
+                        localStorage.setItem('sidebar-mobile-active', isActive ? '1' : '0');
+                        sessionStorage.setItem('sidebar-mobile-active', isActive ? '1' : '0');
+                        root.classList.toggle('sidebar-mobile-active', isActive);
+                    } else {
+                        const isCollapsed = sidebar.classList.contains('collapsed');
+                        localStorage.setItem('sidebar-collapsed', isCollapsed ? '1' : '0');
+                        sessionStorage.setItem('sidebar-collapsed', isCollapsed ? '1' : '0');
+                        root.classList.toggle('sidebar-collapsed', isCollapsed);
+                    }
+                }
+
                 function toggleSidebar() {
                     const sidebar = document.getElementById('sidebar');
                     const backdrop = document.getElementById('sidebar-backdrop');
@@ -485,9 +800,11 @@
                         if (backdrop) {
                             backdrop.classList.toggle('active');
                         }
+                        saveSidebarState(sidebar);
                     } else {
                         // For desktop: toggle collapsed class
                         sidebar.classList.toggle('collapsed');
+                        saveSidebarState(sidebar);
                     }
                 }
                 
@@ -499,6 +816,81 @@
                             toggleSidebar();
                         });
                     }
+                });
+
+                // Restore collapsed state on page load (desktop only)
+                document.addEventListener('DOMContentLoaded', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    if (!sidebar) {
+                        return;
+                    }
+
+                    if (window.innerWidth > 768) {
+                        const saved = localStorage.getItem('sidebar-collapsed') || sessionStorage.getItem('sidebar-collapsed');
+                        if (saved === '1') {
+                            sidebar.classList.add('collapsed');
+                            document.documentElement.classList.add('sidebar-collapsed');
+                        }
+                    } else {
+                        const savedMobile = localStorage.getItem('sidebar-mobile-active') || sessionStorage.getItem('sidebar-mobile-active');
+                        const backdrop = document.getElementById('sidebar-backdrop');
+                        if (savedMobile === '1') {
+                            sidebar.classList.add('active');
+                            if (backdrop) {
+                                backdrop.classList.add('active');
+                            }
+                            document.documentElement.classList.add('sidebar-mobile-active');
+                        }
+                    }
+                });
+
+                // Persist state before navigation and reapply on resize
+                document.addEventListener('DOMContentLoaded', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    if (!sidebar) {
+                        return;
+                    }
+
+                    const navLinks = document.querySelectorAll('.nav-link');
+                    navLinks.forEach(link => {
+                        link.addEventListener('mousedown', function() {
+                            saveSidebarState(sidebar);
+                        });
+                        link.addEventListener('touchstart', function() {
+                            saveSidebarState(sidebar);
+                        }, { passive: true });
+                        link.addEventListener('click', function() {
+                            saveSidebarState(sidebar);
+                        });
+                    });
+
+                    window.addEventListener('beforeunload', function() {
+                        saveSidebarState(sidebar);
+                    });
+
+                    window.addEventListener('resize', function() {
+                        const backdrop = document.getElementById('sidebar-backdrop');
+                        const saved = localStorage.getItem('sidebar-collapsed') || sessionStorage.getItem('sidebar-collapsed');
+                        const savedMobile = localStorage.getItem('sidebar-mobile-active') || sessionStorage.getItem('sidebar-mobile-active');
+
+                        if (window.innerWidth > 768) {
+                            sidebar.classList.toggle('collapsed', saved === '1');
+                            sidebar.classList.remove('active');
+                            if (backdrop) {
+                                backdrop.classList.remove('active');
+                            }
+                            document.documentElement.classList.toggle('sidebar-collapsed', saved === '1');
+                            document.documentElement.classList.remove('sidebar-mobile-active');
+                        } else {
+                            sidebar.classList.toggle('active', savedMobile === '1');
+                            sidebar.classList.remove('collapsed');
+                            if (backdrop) {
+                                backdrop.classList.toggle('active', savedMobile === '1');
+                            }
+                            document.documentElement.classList.toggle('sidebar-mobile-active', savedMobile === '1');
+                            document.documentElement.classList.remove('sidebar-collapsed');
+                        }
+                    });
                 });
                 
                 // Highlight active nav link based on current page

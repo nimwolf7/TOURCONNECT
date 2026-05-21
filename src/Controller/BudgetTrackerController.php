@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\BudgetTracker;
+use App\Entity\User;
 use App\Form\BudgetTrackerType;
+use App\Repository\BookingRepository;
 use App\Repository\BudgetTrackerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,13 +25,30 @@ final class BudgetTrackerController extends AbstractController
     }
 
     #[Route('/new', name: 'app_budget_tracker_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, BookingRepository $bookingRepository): Response
     {
         $budgetTracker = new BudgetTracker();
         $form = $this->createForm(BudgetTrackerType::class, $budgetTracker);
         $form->handleRequest($request);
+        $bookingAmountMap = $this->buildBookingAmountMap($bookingRepository);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $booking = $budgetTracker->getBooking();
+            $bookingUser = $budgetTracker->getBooking()?->getUser();
+            if (!$bookingUser instanceof User) {
+                $this->addFlash('error', 'Selected booking has no customer/user assigned.');
+
+                return $this->render('budget_tracker/new.html.twig', [
+                    'budget_tracker' => $budgetTracker,
+                    'form' => $form,
+                    'booking_amount_map' => $bookingAmountMap,
+                ]);
+            }
+
+            $budgetTracker->setUser($bookingUser);
+            if ($booking !== null) {
+                $budgetTracker->setAmountSpent((string) $booking->getTotalAmount());
+            }
             $entityManager->persist($budgetTracker);
             $entityManager->flush();
 
@@ -39,6 +58,7 @@ final class BudgetTrackerController extends AbstractController
         return $this->render('budget_tracker/new.html.twig', [
             'budget_tracker' => $budgetTracker,
             'form' => $form,
+            'booking_amount_map' => $bookingAmountMap,
         ]);
     }
 
@@ -51,13 +71,36 @@ final class BudgetTrackerController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_budget_tracker_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, BudgetTracker $budgetTracker, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, BudgetTracker $budgetTracker, EntityManagerInterface $entityManager, BookingRepository $bookingRepository): Response
     {
         // Staff can now edit any budget tracker record, including those created by admin
         $form = $this->createForm(BudgetTrackerType::class, $budgetTracker);
         $form->handleRequest($request);
+        $bookingAmountMap = $this->buildBookingAmountMap($bookingRepository);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $booking = $budgetTracker->getBooking();
+            $bookingUser = $budgetTracker->getBooking()?->getUser();
+            if (!$bookingUser instanceof User) {
+                $this->addFlash('error', 'Selected booking has no customer/user assigned.');
+
+                return $this->render('budget_tracker/edit.html.twig', [
+                    'budget_tracker' => $budgetTracker,
+                    'form' => $form,
+                    'booking_amount_map' => $bookingAmountMap,
+                ]);
+            }
+
+            $budgetTracker->setUser($bookingUser);
+            if ($booking !== null) {
+                $budgetTracker->setAmountSpent((string) $booking->getTotalAmount());
+            }
             $entityManager->flush();
 
             return $this->redirectToRoute('app_budget_tracker_index', [], Response::HTTP_SEE_OTHER);
@@ -66,6 +109,7 @@ final class BudgetTrackerController extends AbstractController
         return $this->render('budget_tracker/edit.html.twig', [
             'budget_tracker' => $budgetTracker,
             'form' => $form,
+            'booking_amount_map' => $bookingAmountMap,
         ]);
     }
 
@@ -85,5 +129,18 @@ final class BudgetTrackerController extends AbstractController
         }
 
         return $this->redirectToRoute('app_budget_tracker_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function buildBookingAmountMap(BookingRepository $bookingRepository): array
+    {
+        $map = [];
+        foreach ($bookingRepository->findAll() as $booking) {
+            $bookingId = $booking->getId();
+            if ($bookingId !== null) {
+                $map[(string) $bookingId] = (string) $booking->getTotalAmount();
+            }
+        }
+
+        return $map;
     }
 }
