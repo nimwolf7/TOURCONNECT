@@ -39,8 +39,8 @@ class Service
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $category = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $stock = null;
+    #[ORM\Column(nullable: true, name: 'slots')]
+    private ?int $slots = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $dateAdded = null;
@@ -102,14 +102,14 @@ class Service
         return $this;
     }
 
-    public function getStock(): ?int
+    public function getSlots(): ?int
     {
-        return $this->stock;
+        return $this->slots;
     }
 
-    public function setStock(?int $stock): static
+    public function setSlots(?int $slots): static
     {
-        $this->stock = $stock;
+        $this->slots = $slots;
         return $this;
     }
 

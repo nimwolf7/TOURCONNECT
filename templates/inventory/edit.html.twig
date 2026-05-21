@@ -57,21 +57,31 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 </style>
-<div class="page-card">
-    <div class="page-header">
-        <h3>
-            <i class="fas fa-edit"></i>
-            Edit Inventory
-        </h3>
-        <a href="{{ path('app_inventory_index') }}" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Back to List
-        </a>
-    </div>
-    <div class="page-body">
-        {{ include('inventory/_form.html.twig', {'button_label': 'Update'}) }}
-        <br>
-        {{ include('inventory/_delete_form.html.twig') }}
+<div class="admin-page">
+    <div class="page-card">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <div class="page-header">
+            <h3>
+                <i class="fas fa-edit"></i>
+                Edit Inventory
+            </h3>
+            <a href="{{ path('app_inventory_index') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to List
+            </a>
+        </div>
+        <div class="page-body">
+            {{ include('inventory/_form.html.twig', {'button_label': 'Update'}) }}
+            <br>
+            {{ include('inventory/_delete_form.html.twig') }}
+        </div>
     </div>
 </div>
 {% endblock %}

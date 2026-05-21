@@ -7,62 +7,64 @@
     .details-card {
         background: #F5F1E6;
         border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
 
-    .details-header {
-        background: linear-gradient(135deg, #13616C, #0E4A52);
-        color: white;
-        padding: 25px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 3px solid rgba(255,255,255,0.2);
-    }
+        <div class="admin-page">
+            <div class="container mt-4">
+                <div class="details-card">
+                    <div class="details-header">
+                        <h3>
+                            <i class="fa-solid fa-credit-card"></i>
+                            Payment Details
+                        </h3>
+                        <a href="{{ path('app_payment_index') }}" class="back-btn-header">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Back to List
+                        </a>
+                    </div>
 
-    .details-header h3 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+                    <div class="details-body">
+                        <table class="info-table">
+                            <tbody>
+                                <tr>
+                                    <th>ID</th>
+                                    <td><span class="payment-id">{{ payment.id }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Amount</th>
+                                    <td><span class="amount">₱{{ payment.amount|number_format(2) }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Method</th>
+                                    <td><span class="method">{{ payment.method }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Payment Status</th>
+                                    <td>
+                                        {% if payment.paymentStatus|lower == 'confirmed' %}
+                                            <span class="status-badge status-confirmed">Confirmed</span>
+                                        {% elseif payment.paymentStatus|lower == 'pending' %}
+                                            <span class="status-badge status-pending">Pending</span>
+                                        {% elseif payment.paymentStatus|lower == 'failed' %}
+                                            <span class="status-badge status-failed">Failed</span>
+                                        {% else %}
+                                            <span class="status-badge status-default">{{ payment.paymentStatus }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-    .details-header h3 i {
-        font-size: 1.3rem;
-    }
-
-    .back-btn-header {
-        background: rgba(255,255,255,0.2);
-        border: 1px solid rgba(255,255,255,0.3);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .back-btn-header:hover {
-        background: rgba(255,255,255,0.3);
-        color: white;
-        transform: translateX(-3px);
-    }
-
-    .details-body {
-        padding: 35px 30px;
-    }
-
-    .info-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        background: #F5F1E6;
+                        <div class="button-group">
+                            <a href="{{ path('app_payment_edit', {'id': payment.id}) }}" class="edit-btn">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Edit
+                            </a>
+                            {{ include('payment/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);

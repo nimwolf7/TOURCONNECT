@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[Route('/services')]
 class ServiceController extends AbstractController
@@ -62,10 +63,10 @@ class ServiceController extends AbstractController
                 $imageFile = $form->get('imageFile')->getData();
                 if ($imageFile) {
                     $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = transliterator_transliterate(
-                        'Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()',
-                        $originalFilename
-                    );
+                    $safeFilename = (new AsciiSlugger())
+                        ->slug($originalFilename)
+                        ->lower()
+                        ->toString();
                     $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                     try {
@@ -88,7 +89,7 @@ class ServiceController extends AbstractController
                 $inventory = $inventoryRepo->findOneBy(['service' => $service]) ?? new \App\Entity\Inventory();
 
                 $inventory->setService($service);
-                $inventory->setQuantityAvailable($service->getStock() ?? 0);
+                $inventory->setQuantityAvailable($service->getSlots() ?? 0);
                 $inventory->setLastUpdated(new \DateTime());
 
                 $em->persist($inventory);
@@ -114,13 +115,19 @@ class ServiceController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_service_edit')]
+    #[Route('/{id}/edit', name: 'app_service_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Service $service, EntityManagerInterface $em): Response
     {
         // Staff can now edit any service, including those created by admin
 
         $form = $this->createForm(ServiceType::class, $service);
         $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -137,7 +144,10 @@ class ServiceController extends AbstractController
                 }
 
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                $safeFilename = (new AsciiSlugger())
+                    ->slug($originalFilename)
+                    ->lower()
+                    ->toString();
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                 try {
@@ -158,7 +168,7 @@ class ServiceController extends AbstractController
             $inventory = $inventoryRepo->findOneBy(['service' => $service]) ?? new \App\Entity\Inventory();
 
             $inventory->setService($service);
-            $inventory->setQuantityAvailable($service->getStock() ?? 0);
+            $inventory->setQuantityAvailable($service->getSlots() ?? 0);
             $inventory->setLastUpdated(new \DateTime());
 
             $em->persist($inventory);
@@ -174,7 +184,7 @@ class ServiceController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Service updated successfully!');
-            return $this->redirectToRoute('app_service_index');
+            return $this->redirectToRoute('app_service_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('service/edit.html.twig', [

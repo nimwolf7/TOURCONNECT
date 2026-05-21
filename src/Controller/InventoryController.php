@@ -74,11 +74,17 @@ final class InventoryController extends AbstractController
         $form = $this->createForm(InventoryType::class, $inventory);
         $form->handleRequest($request);
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
-            // Update the related service stock
+            // Update the related service slots
             $service = $inventory->getService();
             if ($service) {
-                $service->setStock($inventory->getQuantityAvailable());
+                $service->setSlots($inventory->getQuantityAvailable());
             }
             $entityManager->flush();
 

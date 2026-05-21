@@ -109,56 +109,57 @@
         margin-top: 5px;
     }
 </style>
+<div class="admin-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h3><i class="fas fa-user-edit"></i> Edit User: {{ user.username }}</h3>
+        </div>
 
-<div class="form-card">
-    <div class="form-header">
-        <h3><i class="fas fa-user-edit"></i> Edit User: {{ user.username }}</h3>
-    </div>
-
-    <div class="form-body">
-        <form method="post">
-            <div class="form-group">
-                <label class="form-label" for="username">
-                    <i class="fas fa-user"></i> Username
-                </label>
-                <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">
-                    <i class="fas fa-lock"></i> Password
-                </label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep current password">
-                <div class="help-text">Leave empty to keep the current password</div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-user-shield"></i> Roles
-                </label>
-                <div class="checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="roles[]" value="ROLE_ADMIN" 
-                               {% if 'ROLE_ADMIN' in user.roles %}checked{% endif %}>
-                        <span>Admin</span>
+        <div class="form-body">
+            <form method="post">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user"></i> Username
                     </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="roles[]" value="ROLE_STAFF"
-                               {% if 'ROLE_STAFF' in user.roles %}checked{% endif %}>
-                        <span>Staff</span>
-                    </label>
+                    <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" required>
                 </div>
-            </div>
 
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Update User
-                </button>
-                <a href="{{ path('app_user_index') }}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
-            </div>
-        </form>
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep current password">
+                    <div class="help-text">Leave empty to keep the current password</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user-shield"></i> Roles
+                    </label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="roles[]" value="ROLE_ADMIN" 
+                                   {% if 'ROLE_ADMIN' in user.roles %}checked{% endif %}>
+                            <span>Admin</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="roles[]" value="ROLE_STAFF"
+                                   {% if 'ROLE_STAFF' in user.roles %}checked{% endif %}>
+                            <span>Staff</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update User
+                    </button>
+                    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

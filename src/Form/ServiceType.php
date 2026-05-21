@@ -81,16 +81,16 @@ class ServiceType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('stock', IntegerType::class, [
-                'label' => 'Stock Quantity',
+            ->add('slots', IntegerType::class, [
+                'label' => 'Slots',
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter stock quantity',
+                        'message' => 'Please enter slots',
                     ]),
                     new GreaterThanOrEqual([
                         'value' => 0,
-                        'message' => 'Stock cannot be negative',
+                        'message' => 'Slots cannot be negative',
                     ]),
                 ],
             ])

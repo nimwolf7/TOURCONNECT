@@ -68,48 +68,50 @@
         box-shadow: 0 4px 12px rgba(220,53,69,0.3);
     }
 </style>
-<div class="page-card">
-    <div class="page-header">
-        <h3>
-            <i class="fas fa-box"></i>
-            Inventory Details
-        </h3>
-        <a href="{{ path('app_inventory_index') }}" class="action-btn action-btn-edit">
-            <i class="fas fa-arrow-left"></i> Back to List
-        </a>
-    </div>
-    <div class="page-body">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th>ID</th>
-                    <td>{{ inventory.id }}</td>
-                </tr>
-                <tr>
-                    <th>Service</th>
-                    <td>
-                        {% if inventory.service %}
-                            <strong>{{ inventory.service.title }}</strong><br>
-                            <span class="text-muted">#{{ inventory.service.id }}</span>
-                        {% else %}
-                            <span class="text-danger">No Service Linked</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <th>Quantity Available</th>
-                    <td>{{ inventory.quantityAvailable }}</td>
-                </tr>
-                <tr>
-                    <th>Last Updated</th>
-                    <td>{{ inventory.lastUpdated ? inventory.lastUpdated|date('M d, Y H:i') : '-' }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <a href="{{ path('app_inventory_edit', {'id': inventory.id}) }}" class="action-btn action-btn-edit">
-            <i class="fas fa-edit"></i> Edit
-        </a>
-        {{ include('inventory/_delete_form.html.twig') }}
+<div class="admin-page">
+    <div class="page-card">
+        <div class="page-header">
+            <h3>
+                <i class="fas fa-box"></i>
+                Inventory Details
+            </h3>
+            <a href="{{ path('app_inventory_index') }}" class="action-btn action-btn-edit">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+        <div class="page-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ inventory.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Service</th>
+                        <td>
+                            {% if inventory.service %}
+                                <strong>{{ inventory.service.title }}</strong><br>
+                                <span class="text-muted">#{{ inventory.service.id }}</span>
+                            {% else %}
+                                <span class="text-danger">No Service Linked</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Quantity Available</th>
+                        <td>{{ inventory.quantityAvailable }}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Updated</th>
+                        <td>{{ inventory.lastUpdated ? inventory.lastUpdated|date('M d, Y H:i') : '-' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="{{ path('app_inventory_edit', {'id': inventory.id}) }}" class="action-btn action-btn-edit">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            {{ include('inventory/_delete_form.html.twig') }}
+        </div>
     </div>
 </div>
 {% endblock %}

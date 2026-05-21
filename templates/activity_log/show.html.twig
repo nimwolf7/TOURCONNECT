@@ -3,32 +3,51 @@
 {% block title %}Activity Log{% endblock %}
 
 {% block body %}
-    <h1>Activity Log Details</h1>
+<div class="admin-page">
+    <div class="container mt-4">
+        <div class="details-card">
+            <div class="details-header">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    Activity Log Details
+                </h3>
+                <a href="{{ path('app_activity_log_index') }}" class="back-btn-header">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to List
+                </a>
+            </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ activity_log.id }}</td>
-            </tr>
-            <tr>
-                <th>Action</th>
-                <td>{{ activity_log.action }}</td>
-            </tr>
-            <tr>
-                <th>Timestamp</th>
-                <td>{{ activity_log.timestamp ? activity_log.timestamp|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>IpAddress</th>
-                <td>{{ activity_log.ipAddress }}</td>
-            </tr>
-        </tbody>
-    </table>
+            <div class="details-body">
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                            <th>ID</th>
+                            <td>{{ activity_log.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Action</th>
+                            <td>{{ activity_log.action }}</td>
+                        </tr>
+                        <tr>
+                            <th>Timestamp</th>
+                            <td>{{ activity_log.timestamp ? activity_log.timestamp|date('Y-m-d H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>IP Address</th>
+                            <td>{{ activity_log.ipAddress }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    <a href="{{ path('app_activity_log_index') }}">back to list</a>
-
-    <a href="{{ path('app_activity_log_edit', {'id': activity_log.id}) }}">edit</a>
-
-    {{ include('activity_log/_delete_form.html.twig') }}
+                <div class="button-group">
+                    <a href="{{ path('app_activity_log_edit', {'id': activity_log.id}) }}" class="edit-btn">
+                        <i class="fas fa-pen-to-square"></i>
+                        Edit
+                    </a>
+                    {{ include('activity_log/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

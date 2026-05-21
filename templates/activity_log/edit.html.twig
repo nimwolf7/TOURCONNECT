@@ -3,11 +3,28 @@
 {% block title %}Edit Activity Log{% endblock %}
 
 {% block body %}
-    <h1>Edit Activity Log</h1>
+<div class="admin-page">
+    <div class="container mt-4">
+        <div class="form-card">
+            <div class="form-header">
+                <h3>
+                    <i class="fas fa-pen-to-square"></i>
+                    Edit Activity Log
+                </h3>
+                <a href="{{ path('app_activity_log_index') }}" class="back-btn-header">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to List
+                </a>
+            </div>
 
-    {{ include('activity_log/_form.html.twig', {'button_label': 'Update'}) }}
+            <div class="form-body">
+                {{ include('activity_log/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_activity_log_index') }}">back to list</a>
-
-    {{ include('activity_log/_delete_form.html.twig') }}
+                <div class="mt-4">
+                    {{ include('activity_log/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

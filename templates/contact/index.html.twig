@@ -1,0 +1,348 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #123640;
+            --reef: #0e6b73;
+            --sand: #f6efe3;
+            --clay: #d57a5c;
+            --mist: #e7f0ef;
+            --shadow: 0 20px 40px rgba(18, 54, 64, 0.12);
+        }
+
+        .content-area {
+            padding: 0;
+            background: var(--sand);
+        }
+
+        .contact-page {
+            font-family: 'Work Sans', Arial, sans-serif;
+            color: var(--ink);
+        }
+
+        .contact-page h1,
+        .contact-page h2,
+        .contact-page h3 {
+            font-family: 'Playfair Display', 'Times New Roman', serif;
+        }
+
+        .contact-page .container-wide {
+            width: min(1200px, 92vw);
+            margin: 0 auto;
+        }
+
+        .landing-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(246, 239, 227, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(18, 54, 64, 0.08);
+        }
+
+        .landing-nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+        }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--clay);
+            box-shadow: 0 0 0 6px rgba(213, 122, 92, 0.15);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            font-size: 15px;
+            color: var(--ink);
+        }
+
+        .nav-links a {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        .nav-cta-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-cta {
+            padding: 10px 18px;
+            background: var(--ink);
+            color: #fff;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-cta.secondary {
+            background: transparent;
+            color: var(--ink);
+            border: 1px solid rgba(18, 54, 64, 0.35);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+        }
+
+        .contact-hero {
+            padding: 110px 0 70px;
+            background: linear-gradient(120deg, rgba(18, 54, 64, 0.85), rgba(14, 107, 115, 0.75)), url('{{ asset('images/ph.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+
+        .contact-hero h1 {
+            font-size: clamp(2.4rem, 4vw, 4rem);
+            margin-bottom: 12px;
+        }
+
+        .contact-hero p {
+            max-width: 620px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .section {
+            padding: 70px 0;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 28px;
+            align-items: start;
+        }
+
+        .contact-card {
+            grid-column: span 4;
+            background: #fff;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(18, 54, 64, 0.06);
+        }
+
+        .contact-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .contact-card p {
+            margin-bottom: 12px;
+            color: rgba(18, 54, 64, 0.75);
+        }
+
+        .contact-card .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--mist);
+            color: var(--reef);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .contact-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .contact-info-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(18, 54, 64, 0.85);
+            font-weight: 600;
+        }
+
+        .contact-info-list i {
+            color: var(--reef);
+        }
+
+        .form-panel {
+            grid-column: span 8;
+            background: #fff;
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(18, 54, 64, 0.06);
+        }
+
+        .form-panel iframe {
+            width: 100%;
+            min-height: 720px;
+            border: none;
+            border-radius: 18px;
+            background: #f8fafc;
+        }
+
+        .feedback-panel {
+            margin-top: 22px;
+            background: var(--mist);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+
+        .feedback-panel h3 {
+            margin-bottom: 8px;
+        }
+
+        .feedback-panel p {
+            margin: 0;
+            color: rgba(18, 54, 64, 0.75);
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .faq-card {
+            background: #fff;
+            padding: 22px;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(18, 54, 64, 0.06);
+        }
+
+        .contact-link {
+            color: var(--reef);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 900px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-card,
+            .form-panel {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .contact-hero {
+                padding: 90px 0 60px;
+            }
+
+            .section {
+                padding: 55px 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="contact-page">
+        <nav class="landing-nav">
+            <div class="container-wide landing-nav-inner">
+                <div class="brand-mark">
+                    <span class="brand-dot"></span>
+                    <span>Tour Connect</span>
+                </div>
+                <div class="nav-links">
+                    <a href="{{ path('app_landing') }}#journeys">Journeys</a>
+                    <a href="{{ path('app_landing') }}#experience">Experience</a>
+                    <a href="{{ path('app_landing') }}#stories">Stories</a>
+                    <a href="{{ path('app_landing') }}#plans">Plans</a>
+                    <a href="{{ path('app_about') }}">About Us</a>
+                    <a href="{{ path('app_contact') }}">Contact Us</a>
+                </div>
+                <div class="nav-cta-group">
+                    <a class="nav-cta secondary" href="{{ path('app_register') }}">Register</a>
+                    <a class="nav-cta" href="{{ path('app_login') }}">Login</a>
+                </div>
+            </div>
+        </nav>
+        <section class="contact-hero">
+            <div class="container-wide">
+                <h1>Contact Us</h1>
+                <p>We are here to help with trip planning, booking updates, and custom requests. Send a message and our team will respond quickly.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container-wide contact-grid">
+                <div class="contact-card">
+                    <h3>Reach the team</h3>
+                    <p>Expect a response within 24 to 48 hours. For urgent booking changes, include your booking reference.</p>
+                    <div class="badge"><i class="fa-solid fa-clock"></i> Response time: 1-2 days</div>
+                    <p style="margin-top: 14px;">
+                        Prefer email? <a class="contact-link" href="mailto:hello@tourconnect.com">hello@tourconnect.com</a>
+                    </p>
+                    <ul class="contact-info-list">
+                        <li>
+                            <i class="fa-solid fa-phone"></i>
+                            <a class="contact-link" href="tel:+639183656789">0918 365 6789</a>
+                        </li>
+                        <li>
+                            <i class="fa-brands fa-facebook"></i>
+                            Tour Connect Facebook Page
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-location-dot"></i>
+                            Cebu City, Philippines
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="form-panel">
+                    <h3>Send a message</h3>
+                    <p>Our contact form is powered by Google Forms.</p>
+                    <iframe title="Tour Connect Contact Form" src="{{ formUrl }}"></iframe>
+                    <div class="feedback-panel">
+                        <h3>Submission feedback</h3>
+                        <p>After you click submit, Google Forms will show a confirmation message. We will reply within 24-48 hours.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container-wide">
+                <div class="faq-grid">
+                    <div class="faq-card">
+                        <h3>Can I edit my request later?</h3>
+                        <p>Yes. Reply to the confirmation email or send a new form with updated details.</p>
+                    </div>
+                    <div class="faq-card">
+                        <h3>What details help you respond faster?</h3>
+                        <p>Destination, dates, group size, and budget range help us prioritize your request.</p>
+                    </div>
+                    <div class="faq-card">
+                        <h3>Do you offer custom itineraries?</h3>
+                        <p>Absolutely. Let us know your travel style and we will craft options for you.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,454 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #123640;
+            --reef: #0e6b73;
+            --sand: #f6efe3;
+            --clay: #d57a5c;
+            --mist: #e7f0ef;
+            --shadow: 0 20px 40px rgba(18, 54, 64, 0.12);
+        }
+
+        .content-area {
+            padding: 0;
+            background: var(--sand);
+        }
+
+        .about-page {
+            font-family: 'Work Sans', Arial, sans-serif;
+            color: var(--ink);
+        }
+
+        .about-page h1,
+        .about-page h2,
+        .about-page h3 {
+            font-family: 'Playfair Display', 'Times New Roman', serif;
+        }
+
+        .about-page .container-wide {
+            width: min(1200px, 92vw);
+            margin: 0 auto;
+        }
+
+        .landing-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(246, 239, 227, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(18, 54, 64, 0.08);
+        }
+
+        .landing-nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+        }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--clay);
+            box-shadow: 0 0 0 6px rgba(213, 122, 92, 0.15);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            font-size: 15px;
+            color: var(--ink);
+        }
+
+        .nav-links a {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        .nav-cta-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-cta {
+            padding: 10px 18px;
+            background: var(--ink);
+            color: #fff;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-cta.secondary {
+            background: transparent;
+            color: var(--ink);
+            border: 1px solid rgba(18, 54, 64, 0.35);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+        }
+
+        .about-hero {
+            padding: 110px 0 80px;
+            background: linear-gradient(120deg, rgba(18, 54, 64, 0.85), rgba(14, 107, 115, 0.75)), url('{{ asset('images/ph.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+
+        .about-hero-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 28px;
+            align-items: center;
+        }
+
+        .about-hero-copy {
+            grid-column: span 7;
+        }
+
+        .about-hero-title {
+            font-size: clamp(2.4rem, 4vw, 4rem);
+            margin-bottom: 16px;
+        }
+
+        .about-hero-sub {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            max-width: 560px;
+        }
+
+        .about-hero-card {
+            grid-column: span 5;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 24px;
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(6px);
+        }
+
+        .about-hero-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .about-hero-card p {
+            margin-bottom: 12px;
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 36px;
+        }
+
+        .section-title p {
+            max-width: 520px;
+            margin: 0;
+            color: rgba(18, 54, 64, 0.75);
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .story-card,
+        .value-card,
+        .team-card {
+            background: #fff;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(18, 54, 64, 0.06);
+        }
+
+        .value-grid,
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+        }
+
+        .value-card h3 {
+            margin-bottom: 8px;
+        }
+
+        .team-card {
+            text-align: center;
+        }
+
+        .team-avatar {
+            width: 86px;
+            height: 86px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0e6b73 0%, #1a5f68 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 22px;
+        }
+
+        .team-role {
+            color: var(--reef);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+
+        .metrics {
+            background: var(--mist);
+            padding: 50px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--reef);
+        }
+
+        .cta {
+            padding: 70px 0 90px;
+            background: linear-gradient(120deg, #123640 0%, #0e6b73 100%);
+            color: #fff;
+            text-align: center;
+        }
+
+        .cta p {
+            max-width: 620px;
+            margin: 0 auto 26px;
+        }
+
+        .cta .btn-primary {
+            padding: 12px 22px;
+            border-radius: 999px;
+            background: var(--clay);
+            color: #fff;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .about-hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-hero-copy,
+            .about-hero-card {
+                grid-column: span 1;
+            }
+
+            .section-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .about-hero {
+                padding: 90px 0 70px;
+            }
+
+            .section {
+                padding: 60px 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="about-page">
+        <nav class="landing-nav">
+            <div class="container-wide landing-nav-inner">
+                <div class="brand-mark">
+                    <span class="brand-dot"></span>
+                    <span>Tour Connect</span>
+                </div>
+                <div class="nav-links">
+                    <a href="{{ path('app_landing') }}#journeys">Journeys</a>
+                    <a href="{{ path('app_landing') }}#experience">Experience</a>
+                    <a href="{{ path('app_landing') }}#stories">Stories</a>
+                    <a href="{{ path('app_landing') }}#plans">Plans</a>
+                    <a href="{{ path('app_about') }}">About Us</a>
+                    <a href="{{ path('app_contact') }}">Contact Us</a>
+                </div>
+                <div class="nav-cta-group">
+                    <a class="nav-cta secondary" href="{{ path('app_register') }}">Register</a>
+                    <a class="nav-cta" href="{{ path('app_login') }}">Login</a>
+                </div>
+            </div>
+        </nav>
+        <section class="about-hero">
+            <div class="container-wide about-hero-grid">
+                <div class="about-hero-copy">
+                    <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem;">Our story</p>
+                    <h1 class="about-hero-title">We build trips that feel personal, calm, and well cared for.</h1>
+                    <p class="about-hero-sub">Tour Connect blends local insight with thoughtful planning so every traveler feels seen, supported, and excited to explore.</p>
+                </div>
+                <div class="about-hero-card">
+                    <h3>Why we started</h3>
+                    <p>We noticed travelers wanted more than bookings. They wanted guidance, clarity, and real-time help. We built a team that delivers all three.</p>
+                    <p><strong>Based in the Philippines.</strong> Serving journeys across the archipelago.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container-wide">
+                <div class="section-title">
+                    <h2>What we stand for</h2>
+                    <p>We keep every trip grounded in trust, warmth, and a personal touch.</p>
+                </div>
+                <div class="value-grid">
+                    <div class="value-card">
+                        <h3>Personal by default</h3>
+                        <p>We design each itinerary around how you want to travel, not a generic checklist.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Fast, clear booking</h3>
+                        <p>We move quickly and communicate clearly so planning feels easy and stress-free.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Local care</h3>
+                        <p>We partner with trusted hosts and guides who know the best ways to explore.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Support that stays close</h3>
+                        <p>We stay available before, during, and after your trip for peace of mind.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics">
+            <div class="container-wide metrics-grid">
+                <div>
+                    <div class="metric-number">8</div>
+                    <div>Travel specialists</div>
+                </div>
+                <div>
+                    <div class="metric-number">120+</div>
+                    <div>Curated itineraries</div>
+                </div>
+                <div>
+                    <div class="metric-number">15</div>
+                    <div>Partner regions</div>
+                </div>
+                <div>
+                    <div class="metric-number">4.9/5</div>
+                    <div>Traveler satisfaction</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="team">
+            <div class="container-wide">
+                <div class="section-title">
+                    <h2>Meet the Team</h2>
+                    <p>Real people behind every itinerary, focused on care, clarity, and thoughtful travel.</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-avatar">AM</div>
+                        <h3>Arielle Mendoza</h3>
+                        <div class="team-role">Founder and Travel Lead</div>
+                        <p>Shapes the overall trip experience and keeps every itinerary human-first.</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar">JR</div>
+                        <h3>Jose Rivera</h3>
+                        <div class="team-role">Operations Manager</div>
+                        <p>Coordinates partners, schedules, and logistics so trips run smoothly.</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar">LT</div>
+                        <h3>Lina Torres</h3>
+                        <div class="team-role">Guest Experience</div>
+                        <p>Your point person for updates, changes, and on-trip support.</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar">SM</div>
+                        <h3>Sam Mateo</h3>
+                        <div class="team-role">Local Partnerships</div>
+                        <p>Builds trusted relationships with guides, hosts, and activity providers.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container-wide">
+                <div class="section-title">
+                    <h2>How we work</h2>
+                    <p>We take a simple, thoughtful approach so you can focus on the fun.</p>
+                </div>
+                <div class="story-grid">
+                    <div class="story-card">
+                        <h3>Listen</h3>
+                        <p>We learn your travel style, priorities, and comfort level in a short consultation.</p>
+                    </div>
+                    <div class="story-card">
+                        <h3>Design</h3>
+                        <p>We build a flexible itinerary with options, travel time buffers, and clear costs.</p>
+                    </div>
+                    <div class="story-card">
+                        <h3>Book</h3>
+                        <p>We secure stays, guides, and transport quickly so you can confirm with confidence.</p>
+                    </div>
+                    <div class="story-card">
+                        <h3>Support</h3>
+                        <p>We stay close during the trip with updates and fast adjustments when needed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container-wide">
+                <h2>Ready to plan with us?</h2>
+                <p>Tell us where you want to go and how you like to travel. We will handle the details.</p>
+                <a class="btn-primary" href="{{ path('app_register') }}">
+                    <i class="fa-solid fa-plane-departure"></i>
+                    Start your plan
+                </a>
+            </div>
+        </section>
+    </div>
+{% endblock %}
