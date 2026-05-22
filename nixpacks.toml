@@ -1,7 +1,7 @@
 [phases.setup]
+# "..." keeps the PHP provider defaults (php, composer, nginx, etc.)
 nixPkgs = [
-  "composer",
-  "php83",
+  "...",
   "php83Extensions.pdo_mysql",
   "php83Extensions.mbstring",
   "php83Extensions.intl",
