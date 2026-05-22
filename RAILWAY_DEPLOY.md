@@ -8,7 +8,8 @@
 | `APP_DEBUG` | `0` |
 | `APP_SECRET` | long random string (not `$ecretf0rt3st`) |
 | `DATABASE_URL` | `${{MySQL.MYSQL_URL}}?serverVersion=8.0.32&charset=utf8mb4` |
-| `JWT_PASSPHRASE` | Must match the passphrase used when JWT keys were generated (use the same value as in your local `.env`, or set `railway-build-passphrase` if keys were created during Docker build) |
+| `MESSENGER_TRANSPORT_DSN` | `sync://` (do **not** use `doctrine://` unless a queue worker is running) |
+| `JWT_PASSPHRASE` | `railway-build-passphrase` (must match Docker build / `.env.prod`) |
 
 ## After pushing deploy files
 
