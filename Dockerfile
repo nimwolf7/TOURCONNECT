@@ -10,7 +10,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     libicu-dev \
     libzip-dev \
+    curl \
+    ca-certificates \
+    gnupg \
     && docker-php-ext-install intl pdo_mysql zip opcache \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -29,6 +34,8 @@ ENV JWT_PASSPHRASE=${JWT_PASSPHRASE}
 
 RUN php bin/console lexik:jwt:generate-keypair --no-interaction 2>/dev/null || true \
     && composer dump-autoload --optimize --classmap-authoritative \
+    && npm ci \
+    && npm run build \
     && mkdir -p var/cache var/log config/jwt \
     && chmod -R 777 var config/jwt \
     && chmod +x scripts/railway-start.sh scripts/railway-build.sh
