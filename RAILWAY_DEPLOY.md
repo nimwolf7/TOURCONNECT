@@ -10,6 +10,8 @@
 | `DATABASE_URL` | `${{MySQL.MYSQL_URL}}?serverVersion=8.0.32&charset=utf8mb4` |
 | `MESSENGER_TRANSPORT_DSN` | `sync://` (do **not** use `doctrine://` unless a queue worker is running) |
 | `JWT_PASSPHRASE` | `railway-build-passphrase` (must match Docker build / `.env.prod`) |
+| `MAILER_FROM` | `noreply@yourdomain.com` (optional; defaults to `noreply@tourconnect.app`) |
+| `MAILER_DSN` | `null://null` or your SMTP URL for verification emails |
 
 ## After pushing deploy files
 

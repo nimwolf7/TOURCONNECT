@@ -77,7 +77,7 @@ security:
         - { path: ^/api/verify, roles: PUBLIC_ACCESS }
         - { path: ^/api/bookings, roles: ROLE_USER }
         - { path: ^/api/payments, roles: ROLE_USER }
-        - { path: ^/api/payments, roles: ROLE_USER }
+        - { path: ^/api/budget-tracker, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/user, roles: ROLE_ADMIN }
         - { path: ^/activity/log, roles: ROLE_ADMIN }

@@ -212,11 +212,12 @@ class BookingController extends AbstractController
         }
 
         $payment = $paymentRepository->findOneBy(['booking' => $booking]);
-        if ($payment && isset($payload['payment_method'])) {
-            $payment->setMethod((string) $payload['payment_method']);
+        if ($payment && (isset($payload['payment_method']) || isset($payload['paymentMethod']))) {
+            $payment->setMethod((string) ($payload['payment_method'] ?? $payload['paymentMethod']));
         }
-        if ($payment && isset($payload['payment_status'])) {
-            $payment->setPaymentStatus((string) $payload['payment_status']);
+        $paymentStatus = $payload['payment_status'] ?? $payload['paymentStatus'] ?? null;
+        if ($payment && $paymentStatus !== null) {
+            $payment->setPaymentStatus((string) $paymentStatus);
         }
 
         $entityManager->flush();

@@ -20,7 +20,14 @@ class RegistrationController
         EntityManagerInterface $entityManager,
         EmailVerificationService $verificationService
     ): JsonResponse {
-        $payload = $request->toArray();
+        $payload = json_decode($request->getContent(), true);
+        if (!is_array($payload)) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Invalid JSON payload.',
+            ], 400);
+        }
+
         $username = trim((string) ($payload['username'] ?? ''));
         $email = trim((string) ($payload['email'] ?? ''));
         $password = (string) ($payload['password'] ?? '');
@@ -44,7 +51,7 @@ class RegistrationController
                 'success' => false,
                 'message' => 'Email is already registered.',
                 'errors' => [
-                    'email' => 'Email is already registered.'
+                    'email' => 'Email is already registered.',
                 ],
             ], 409);
         }
@@ -55,7 +62,7 @@ class RegistrationController
                 'success' => false,
                 'message' => 'Username is already registered.',
                 'errors' => [
-                    'username' => 'Username is already registered.'
+                    'username' => 'Username is already registered.',
                 ],
             ], 409);
         }
@@ -69,7 +76,12 @@ class RegistrationController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        $verificationUrl = $verificationService->startVerification($user);
+        $verificationUrl = null;
+        try {
+            $verificationUrl = $verificationService->startVerification($user);
+        } catch (\Throwable) {
+            // Account is created even if verification email cannot be sent.
+        }
 
         return new JsonResponse([
             'success' => true,

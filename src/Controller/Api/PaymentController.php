@@ -111,7 +111,7 @@ class PaymentController extends AbstractController
         $payment->setBooking($booking);
         $payment->setAmount((string) ($payload['amount'] ?? $booking->getTotalAmount()));
         $payment->setMethod($method !== '' ? $method : 'Cash');
-        $payment->setPaymentStatus((string) ($payload['status'] ?? 'Pending'));
+        $payment->setPaymentStatus((string) ($payload['status'] ?? $payload['paymentStatus'] ?? $payload['payment_status'] ?? 'Pending'));
         $payment->setPaymentDate(new \DateTimeImmutable('now'));
 
         $entityManager->persist($payment);
@@ -153,8 +153,9 @@ class PaymentController extends AbstractController
         if (isset($payload['method'])) {
             $payment->setMethod((string) $payload['method']);
         }
-        if (isset($payload['status'])) {
-            $payment->setPaymentStatus((string) $payload['status']);
+        $status = $payload['status'] ?? $payload['paymentStatus'] ?? $payload['payment_status'] ?? null;
+        if ($status !== null) {
+            $payment->setPaymentStatus((string) $status);
         }
         if (isset($payload['amount'])) {
             $payment->setAmount((string) $payload['amount']);

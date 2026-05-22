@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\User;
 use App\Repository\BudgetTrackerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +15,13 @@ class BudgetTrackerController extends AbstractController
     public function list(BudgetTrackerRepository $budgetTrackerRepository): JsonResponse
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401);
+        }
+
         $isStaffOrAdmin = $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_STAFF');
         $items = $isStaffOrAdmin ? $budgetTrackerRepository->findAll() : $budgetTrackerRepository->findBy(['user' => $user]);
 
