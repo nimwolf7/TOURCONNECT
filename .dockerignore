@@ -1,0 +1,11 @@
+.git
+.history
+.env
+.env.*
+!.env.test
+var/cache/*
+var/log/*
+node_modules
+vendor
+database/local_export.sql
+terminals
