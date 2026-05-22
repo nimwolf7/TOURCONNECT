@@ -1,9 +1,9 @@
 # Railway must build with Dockerfile (not Nixpacks). See railway.json.
-FROM php:8.4-cli
-
-ARG CACHEBUST=4
+FROM php:8.4.3-cli-bookworm
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+RUN php -v
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY composer.json composer.lock symfony.lock ./
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+RUN php -v && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 COPY . .
 

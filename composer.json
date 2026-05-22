@@ -12,6 +12,7 @@
         "doctrine/dbal": "^3.10.5",
         "doctrine/doctrine-bundle": "^2.18.2",
         "doctrine/doctrine-migrations-bundle": "^3.7",
+        "doctrine/instantiator": "2.0.0",
         "doctrine/orm": "^3.6.2",
         "knpuniversity/oauth2-client-bundle": "*",
         "league/oauth2-google": "*",
