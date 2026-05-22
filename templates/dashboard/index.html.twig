@@ -72,7 +72,7 @@
             <strong>{{ pendingBookings|default(0) }}</strong>
         </div>
         <div class="status-card success">
-            <span>Complete Bookings</span>
+            <span>Confirmed Bookings</span>
             <strong>{{ confirmedBookings|default(0) }}</strong>
         </div>
         <div class="status-card danger">
@@ -105,7 +105,7 @@
                             <td class="fw-bold">PHP {{ booking.totalAmount|number_format(2) }}</td>
                             <td>{{ booking.bookingDate|date('M d, Y') }}</td>
                             <td>
-                                {% if booking.status|lower == 'complete' %}
+                                {% if booking.status|lower == 'confirmed' %}
                                     <span class="badge bg-success">{{ booking.status }}</span>
                                 {% elseif booking.status|lower == 'pending' %}
                                     <span class="badge bg-warning">{{ booking.status }}</span>

@@ -57,12 +57,12 @@ class SampleDataFixtures extends Fixture implements DependentFixtureInterface
         }
 
         $bookingSeeds = [
-            ['Complete', 2, 0, $admin],
+            ['Confirmed', 2, 0, $admin],
             ['Pending', 1, 1, $staff],
             ['Cancelled', 3, 2, $admin],
-            ['Complete', 4, 3, $staff],
+            ['Confirmed', 4, 3, $staff],
             ['Pending', 2, 4, $admin],
-            ['Complete', 1, 5, $staff],
+            ['Confirmed', 1, 5, $staff],
         ];
 
         $bookings = [];

@@ -104,7 +104,7 @@
         letter-spacing: 0.5px;
     }
 
-    .status-complete {
+    .status-confirmed {
         background: linear-gradient(135deg, #28a745, #218838);
         color: white;
         box-shadow: 0 2px 8px rgba(40,167,69,0.3);
@@ -234,8 +234,8 @@
                             <td>
                                 {% if booking.status == 'Pending' %}
                                     <span class="status-badge status-pending">Pending</span>
-                                {% elseif booking.status == 'Complete' %}
-                                    <span class="status-badge status-complete">Complete</span>
+                                {% elseif booking.status == 'Confirmed' %}
+                                    <span class="status-badge status-confirmed">Confirmed</span>
                                 {% elseif booking.status == 'Refund' %}
                                     <span class="status-badge status-refund">Refund</span>
                                 {% elseif booking.status == 'Cancelled' %}

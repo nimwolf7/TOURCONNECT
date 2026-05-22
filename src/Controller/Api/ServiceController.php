@@ -19,21 +19,28 @@ class ServiceController extends AbstractController
 
         $data = array_map(function ($service) use ($baseUrl) {
             $image = $service->getImage();
+            $imageUrl = $image ? $baseUrl . '/images/services/' . $image : null;
+
             return [
                 'id' => $service->getId(),
                 'title' => $service->getTitle(),
+                'name' => $service->getTitle(),
                 'description' => $service->getDescription(),
                 'price' => $service->getPrice(),
                 'category' => $service->getCategory(),
                 'slots' => $service->getSlots(),
+                'stock' => $service->getSlots(),
+                'quantity' => $service->getSlots(),
                 'dateAdded' => $service->getDateAdded(),
-                'imageUrl' => $image ? $baseUrl . '/images/services/' . $image : null,
+                'image' => $image,
+                'imageUrl' => $imageUrl,
             ];
         }, $services);
 
         return new JsonResponse([
             'success' => true,
             'message' => 'Services fetched successfully.',
+            'services' => $data,
             'data' => $data,
             'meta' => [
                 'count' => count($data),

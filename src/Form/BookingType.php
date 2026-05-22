@@ -31,7 +31,7 @@ class BookingType extends AbstractType
             ->add('status', \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
                 'choices' => [
                     'Pending' => 'Pending',
-                    'Complete' => 'Complete',
+                    'Confirmed' => 'Confirmed',
                     'Refund' => 'Refund',
                     'Cancelled' => 'Cancelled',
                 ],

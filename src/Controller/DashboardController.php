@@ -60,7 +60,7 @@ class DashboardController extends AbstractController
                 ->getSingleScalarResult();
 
             $pendingBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Pending']);
-            $confirmedBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Complete']);
+            $confirmedBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Confirmed']);
             $cancelledBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Cancelled']);
             $refundedBookings = $bookingRepository->count(['user' => $currentUser, 'status' => 'Refund']);
 
@@ -88,7 +88,7 @@ class DashboardController extends AbstractController
             )->setParameter('status', 'Confirmed')->getSingleScalarResult() ?? 0;
 
             $pendingBookings = $bookingRepository->count(['status' => 'Pending']);
-            $confirmedBookings = $bookingRepository->count(['status' => 'Complete']);
+            $confirmedBookings = $bookingRepository->count(['status' => 'Confirmed']);
             $cancelledBookings = $bookingRepository->count(['status' => 'Cancelled']);
             $refundedBookings = $bookingRepository->count(['status' => 'Refund']);
 

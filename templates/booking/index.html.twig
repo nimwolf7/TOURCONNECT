@@ -166,7 +166,7 @@
         letter-spacing: 0.5px;
     }
 
-    .status-complete {
+    .status-confirmed {
         background: linear-gradient(135deg, #28a745, #218838);
         color: white;
         box-shadow: 0 2px 8px rgba(40,167,69,0.3);
@@ -308,7 +308,7 @@
                 <select name="status" class="filter-select" onchange="this.form.submit()">
                     <option value="">All Statuses</option>
                     <option value="Pending" {{ app.request.get('status') == 'Pending' ? 'selected' }}>Pending</option>
-                    <option value="Complete" {{ app.request.get('status') == 'Complete' ? 'selected' }}>Complete</option>
+                    <option value="Confirmed" {{ app.request.get('status') == 'Confirmed' ? 'selected' }}>Confirmed</option>
                     <option value="Refund" {{ app.request.get('status') == 'Refund' ? 'selected' }}>Refund</option>
                     <option value="Cancelled" {{ app.request.get('status') == 'Cancelled' ? 'selected' }}>Cancelled</option>
                 </select>
@@ -340,8 +340,8 @@
                                     <td>
                                         {% if booking.status == 'Pending' %}
                                             <span class="status-badge status-pending">Pending</span>
-                                        {% elseif booking.status == 'Complete' %}
-                                            <span class="status-badge status-complete">Complete</span>
+                                        {% elseif booking.status == 'Confirmed' %}
+                                            <span class="status-badge status-confirmed">Confirmed</span>
                                         {% elseif booking.status == 'Refund' %}
                                             <span class="status-badge status-refund">Refund</span>
                                         {% elseif booking.status == 'Cancelled' %}
