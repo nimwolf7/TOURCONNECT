@@ -1,3 +1,6 @@
+# Prefer railway.json for Railway config-as-code.
+# If the dashboard still uses Nixpacks, set: Settings → Build → Builder → Dockerfile
+
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"

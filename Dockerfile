@@ -1,4 +1,7 @@
+# Railway must build with Dockerfile (not Nixpacks). See railway.json.
 FROM php:8.3-cli
+
+ARG CACHEBUST=3
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \

@@ -12,8 +12,9 @@
 
 ## After pushing deploy files
 
-1. Commit and push `railway.toml`, `nixpacks.toml`, and `scripts/railway-*.sh`.
-2. Redeploy **TOURCONNECT**.
+1. Commit and push `Dockerfile`, `railway.json`, and `scripts/railway-*.sh`.
+2. In Railway → **TOURCONNECT** → **Settings** → **Build**, set **Builder** to **Dockerfile** (not Nixpacks/Railpack).
+3. Redeploy **TOURCONNECT** and use **Clear build cache** if the logs still show `nix-env` / Nixpacks.
 3. Test:
    - `https://YOUR-APP.up.railway.app/` → home page
    - `https://YOUR-APP.up.railway.app/api` → JSON API index
