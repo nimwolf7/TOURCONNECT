@@ -32,7 +32,10 @@ RUN cp .env.prod .env
 ARG JWT_PASSPHRASE=railway-build-passphrase
 ENV JWT_PASSPHRASE=${JWT_PASSPHRASE}
 
-RUN php bin/console lexik:jwt:generate-keypair --no-interaction 2>/dev/null || true \
+RUN mkdir -p public/build \
+    && printf '%s' '{"entrypoints":{"app":{"js":[],"css":[]}},"integrity":[]}' > public/build/entrypoints.json \
+    && printf '%s' '{}' > public/build/manifest.json \
+    && php bin/console lexik:jwt:generate-keypair --no-interaction 2>/dev/null || true \
     && composer dump-autoload --optimize --classmap-authoritative \
     && npm ci \
     && npm run build \
