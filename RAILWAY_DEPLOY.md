@@ -8,7 +8,7 @@
 | `APP_DEBUG` | `0` |
 | `APP_SECRET` | long random string (not `$ecretf0rt3st`) |
 | `DATABASE_URL` | `${{MySQL.MYSQL_URL}}?serverVersion=8.0.32&charset=utf8mb4` |
-| `JWT_PASSPHRASE` | same passphrase used when generating JWT keys locally |
+| `JWT_PASSPHRASE` | Must match the passphrase used when JWT keys were generated (use the same value as in your local `.env`, or set `railway-build-passphrase` if keys were created during Docker build) |
 
 ## After pushing deploy files
 

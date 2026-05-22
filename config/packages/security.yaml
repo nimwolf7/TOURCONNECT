@@ -69,11 +69,15 @@ security:
         - { path: ^/home, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/verify/email, roles: PUBLIC_ACCESS }
+        - { path: ^/health, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api$, roles: PUBLIC_ACCESS }
         - { path: ^/api/services, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify, roles: PUBLIC_ACCESS }
         - { path: ^/api/bookings, roles: ROLE_USER }
+        - { path: ^/api/payments, roles: ROLE_USER }
+        - { path: ^/api/payments, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/user, roles: ROLE_ADMIN }
         - { path: ^/activity/log, roles: ROLE_ADMIN }
