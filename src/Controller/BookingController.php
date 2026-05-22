@@ -30,17 +30,6 @@ final class BookingController extends AbstractController
                 ->setParameter('currentUser', $currentUser);
         }
 
-        $bookings = $queryBuilder->orderBy('b.bookingDate', 'DESC')->getQuery()->getResult();
-        if ($search) {
-            $searchLower = strtolower($search);
-            $bookings = array_filter($bookings, function($booking) use ($searchLower) {
-                $idMatch = strpos((string)$booking->getId(), $searchLower) !== false;
-                $statusMatch = strpos(strtolower($booking->getStatus()), $searchLower) !== false;
-                $dateMatch = $booking->getBookingDate() && strpos(strtolower($booking->getBookingDate()->format('Y-m-d H:i')), $searchLower) !== false;
-                return $idMatch || $statusMatch || $dateMatch;
-            });
-        }
-
         if ($status) {
             $queryBuilder
                 ->andWhere('b.status = :status')
@@ -48,6 +37,17 @@ final class BookingController extends AbstractController
         }
 
         $bookings = $queryBuilder->orderBy('b.bookingDate', 'DESC')->getQuery()->getResult();
+
+        if ($search) {
+            $searchLower = strtolower($search);
+            $bookings = array_filter($bookings, function ($booking) use ($searchLower) {
+                $idMatch = strpos((string) $booking->getId(), $searchLower) !== false;
+                $statusMatch = strpos(strtolower((string) $booking->getStatus()), $searchLower) !== false;
+                $dateMatch = $booking->getBookingDate() && strpos(strtolower($booking->getBookingDate()->format('Y-m-d H:i')), $searchLower) !== false;
+
+                return $idMatch || $statusMatch || $dateMatch;
+            });
+        }
 
         return $this->render('booking/index.html.twig', [
             'bookings' => $bookings,

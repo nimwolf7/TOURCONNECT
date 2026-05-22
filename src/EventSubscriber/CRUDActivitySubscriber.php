@@ -31,7 +31,7 @@ class CRUDActivitySubscriber
     public function postPersist(PostPersistEventArgs $args): void
     {
         $entity = $args->getObject();
-        $user = $this->security->getUser();
+        $user = $this->resolveUser($entity);
 
         if (!$user instanceof User || $entity instanceof ActivityLog) {
             return;
@@ -46,7 +46,7 @@ class CRUDActivitySubscriber
     public function postUpdate(PostUpdateEventArgs $args): void
     {
         $entity = $args->getObject();
-        $user = $this->security->getUser();
+        $user = $this->resolveUser($entity);
 
         if (!$user instanceof User || $entity instanceof ActivityLog) {
             return;
@@ -61,7 +61,7 @@ class CRUDActivitySubscriber
     public function postRemove(PostRemoveEventArgs $args): void
     {
         $entity = $args->getObject();
-        $user = $this->security->getUser();
+        $user = $this->resolveUser($entity);
 
         if (!$user instanceof User || $entity instanceof ActivityLog) {
             return;
@@ -71,6 +71,28 @@ class CRUDActivitySubscriber
         if ($action) {
             $this->auditLogger->log($user, $action);
         }
+    }
+
+    /**
+     * JWT/API requests often have no authenticated user inside Doctrine listeners.
+     * Fall back to the entity owner so mobile bookings still appear in admin activity.
+     */
+    private function resolveUser(object $entity): ?User
+    {
+        $user = $this->security->getUser();
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        if ($entity instanceof Booking) {
+            return $entity->getUser();
+        }
+
+        if ($entity instanceof Payment) {
+            return $entity->getOwner();
+        }
+
+        return null;
     }
 
     private function getActionMessage(string $action, object $entity): ?string
