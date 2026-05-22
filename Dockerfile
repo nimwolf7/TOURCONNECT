@@ -22,6 +22,8 @@ RUN php -v && composer install --no-dev --optimize-autoloader --no-interaction -
 
 COPY . .
 
+RUN cp .env.prod .env
+
 ARG JWT_PASSPHRASE=railway-build-passphrase
 ENV JWT_PASSPHRASE=${JWT_PASSPHRASE}
 

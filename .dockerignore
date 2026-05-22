@@ -3,6 +3,7 @@
 .env
 .env.*
 !.env.test
+!.env.prod
 var/cache/*
 var/log/*
 node_modules
